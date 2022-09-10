@@ -8,6 +8,7 @@ public class DesenvIntegradoApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(DesenvIntegradoApplication.class, args);
+        
     }
 
 }
