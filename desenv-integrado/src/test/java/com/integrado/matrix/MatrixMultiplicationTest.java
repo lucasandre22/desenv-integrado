@@ -78,7 +78,7 @@ public class MatrixMultiplicationTest {
     @Test
     void testMultiplication() {
         assertEquals(multiplyMatrix(matrixM, matrixN), matrixMN);
-        //Assertion is failing because jblas is getting more precise decimals xDD
+        //Assertion is failing because jBlas is getting more precise decimals xDD
         //assertEquals(multiplyMatrix(matrixA, matrixM), matrixAM);
 
         //This multiplication does not make sense
