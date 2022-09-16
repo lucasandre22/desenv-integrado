@@ -5,7 +5,6 @@ import lombok.Data;
 @Data
 public class ExampleDTO {
 
-    //double[] array;
     private String array;
 
     @Override

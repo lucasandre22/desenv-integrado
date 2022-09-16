@@ -1,13 +1,9 @@
 package com.integrado.matrix;
 
-import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.jblas.DoubleMatrix;
@@ -77,12 +73,18 @@ public class MatrixMultiplicationTest {
 
     @Test
     void testMultiplication() {
-        assertEquals(multiplyMatrix(matrixM, matrixN), matrixMN);
+        assertEquals(matrixMN, multiplyMatrix(matrixM, matrixN));
         //Assertion is failing because jBlas is getting more precise decimals xDD
-        //assertEquals(multiplyMatrix(matrixA, matrixM), matrixAM);
+        assertEquals(matrixAM, multiplyMatrix(matrixA, matrixM));
 
         //This multiplication does not make sense
         //multiplyMatrix(matrixM, matrixA);
 
     }
+    
+    //cliente pode ser json, manda imagens em intervalo randomico
+    //rodadas de 5 min, 10 min...
+    //gerenciador de filas
+    //fazer log a cada 5 segundos de desempenho. (pesquisar melhor maneira0
+    
 }
