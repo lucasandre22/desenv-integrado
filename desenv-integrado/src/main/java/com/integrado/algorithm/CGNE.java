@@ -2,6 +2,7 @@ package com.integrado.algorithm;
 
 import org.jblas.DoubleMatrix;
 
+import com.integrado.util.Constants;
 import com.integrado.util.CsvParser;
 
 import lombok.Data;
@@ -14,10 +15,12 @@ import lombok.Data;
 @Data
 public class CGNE implements Algorithm {
 
-    private static final String PATH_TO_MATRIXES = "../modelo1/";
-    private DoubleMatrix arrayG = new DoubleMatrix(CsvParser.readDoubleMatrixFromCsvFile(PATH_TO_MATRIXES + "g-30x30-1.csv"));
-    private DoubleMatrix matrixH = new DoubleMatrix(CsvParser.readDoubleMatrixFromCsvFile(PATH_TO_MATRIXES + "H-2.csv"));
+    private DoubleMatrix arrayG = new DoubleMatrix(CsvParser.readDoubleMatrixFromCsvFile(Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_2_G_MATRIX));
+    private DoubleMatrix matrixH = new DoubleMatrix(CsvParser.readDoubleMatrixFromCsvFile(Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_2_H_MATRIX));
 
+    /**
+     * TODO
+     */
     public static void main(String[] args) {
         CGNE teste = new CGNE();
         DoubleMatrix f = DoubleMatrix.zeros(1, 30);
