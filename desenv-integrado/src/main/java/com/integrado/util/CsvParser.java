@@ -32,7 +32,7 @@ public class CsvParser {
         }
         return matrixDouble;
     }
-    
+
     public static float[][] readFloatMatrixFromCsvFile(String matrixName) {
         List<float[]> matrixLines = new ArrayList<float[]>();
         float[][] matrixDouble;
