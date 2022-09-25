@@ -21,4 +21,6 @@ public class Constants {
     public static final String MODEL_2_G_MATRIX = "g-30x30-1." + FILE_TYPE;
     public static final String MODEL_2_H_MATRIX = "H-2." + FILE_TYPE;
     
+    public static final float ERROR = 0.0001f;
+    
 }

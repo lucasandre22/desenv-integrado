@@ -1,19 +1,15 @@
 package com.integrado.util;
 
-import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.jblas.FloatMatrix;
 
-import com.opencsv.CSVParser;
-import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
 
 public class CsvParser {
-    
+
     public static double[][] readDoubleMatrixFromCsvFile(String matrixName) {
         List<double[]> matrixLines = new ArrayList<double[]>();
         double[][] matrixDouble;
@@ -62,42 +58,7 @@ public class CsvParser {
         return matrixDouble;
     }
 
-    public static FloatMatrix readFloatMatrixFromCsvFile(String matrixName, char separator) {
-        FloatMatrix matrix = null;
-        List<float[]> matrixLines = new ArrayList<float[]>();
-        
-        try {
-            CSVParser parser = new CSVParserBuilder().withSeparator(separator).build();
-            CSVReader csvReader = new CSVReaderBuilder(new FileReader(new File(matrixName)))
-                                  .withCSVParser(parser)
-                                  .build();
+    public static void writeToCsv(FloatMatrix a) {
 
-            //Utiliza matriz pois o jblas só constroi FloatMatrix com uma matriz (1,n) 
-            //a partir de uma matriz
-            String[] values;
-            int j = 0;
-            while ((values = csvReader.readNext()) != null) {
-                //Só sabemos quantas colunas os arquivo têm depois de lê-lo, por isso declarar aqui
-                float[] matrixLine = new float[values.length];
-                
-                int i = 0;
-                for(String value : values) {
-                    matrixLine[i++] = Double.valueOf(value).floatValue();
-                }
-                matrixLines.add(matrixLine);
-                //System.out.println("Lido linha: " + j++);
-            }
-        } catch(Exception e) {
-            System.err.println(e);
-        }
-        
-        int i=0;
-        float[][] grouped = new float[matrixLines.size()][matrixLines.get(0).length];
-        for(float[] line : matrixLines) {
-            grouped[i++] = line;
-        }
-        
-        matrix = new FloatMatrix(grouped);
-        return matrix;
     }
 }
