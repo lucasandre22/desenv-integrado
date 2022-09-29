@@ -67,10 +67,10 @@ public class CGNE implements Algorithm {
     }
 
     public static void main(String[] args) {
-        FloatMatrix arrayG = new FloatMatrix(CsvParser.readFloatMatrixFromCsvFile(
-                Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_2_G_MATRIX));
-        FloatMatrix matrixH = new FloatMatrix(CsvParser.readFloatMatrixFromCsvFile(
-                Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_2_H_MATRIX));;
+        FloatMatrix arrayG = CsvParser.readFloatMatrixFromCsvFile(
+                Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_2_G_MATRIX);
+        FloatMatrix matrixH = CsvParser.readFloatMatrixFromCsvFile(
+                Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_2_H_MATRIX);
         Algorithm cgne = new CGNE();
         cgne.run(matrixH, arrayG);
     }

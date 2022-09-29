@@ -4,13 +4,14 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jblas.DoubleMatrix;
 import org.jblas.FloatMatrix;
 
 import com.opencsv.CSVReader;
 
 public class CsvParser {
 
-    public static double[][] readDoubleMatrixFromCsvFile(String matrixName) {
+    public static DoubleMatrix readDoubleMatrixFromCsvFile(String matrixName) {
         List<double[]> matrixLines = new ArrayList<double[]>();
         double[][] matrixDouble;
 
@@ -31,10 +32,10 @@ public class CsvParser {
         for(double[] line: matrixLines) {
             matrixDouble[i++] = line;
         }
-        return matrixDouble;
+        return new DoubleMatrix(matrixDouble);
     }
 
-    public static float[][] readFloatMatrixFromCsvFile(String matrixName) {
+    public static FloatMatrix readFloatMatrixFromCsvFile(String matrixName) {
         List<float[]> matrixLines = new ArrayList<float[]>();
         float[][] matrixDouble;
 
@@ -55,7 +56,7 @@ public class CsvParser {
         for(float[] line: matrixLines) {
             matrixDouble[i++] = line;
         }
-        return matrixDouble;
+        return new FloatMatrix(matrixDouble);
     }
 
     public static void writeToCsv(FloatMatrix a) {
