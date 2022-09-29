@@ -14,10 +14,7 @@ public class CGNR implements Algorithm {
 
     private final static int CONVERGENCE = 1000;
 
-    private FloatMatrix arrayG = new FloatMatrix(CsvParser.readFloatMatrixFromCsvFile(
-            Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_2_G_MATRIX));
-    private FloatMatrix matrixH = new FloatMatrix(CsvParser.readFloatMatrixFromCsvFile(
-            Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_2_H_MATRIX));
-
-
+    public AlgorithmOutput run(FloatMatrix matrixH, FloatMatrix arrayG) {
+        return null;
+    }
 }
