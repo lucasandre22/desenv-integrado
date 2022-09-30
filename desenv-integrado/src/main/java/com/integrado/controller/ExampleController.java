@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.integrado.dto.ExampleDTO;
+import com.integrado.dto.AlgorithmInputDTO;
 
 /**
  * 
@@ -26,8 +26,8 @@ public class ExampleController {
      * @return
      */
     @GetMapping("/status") //specify which address is going to call this method
-    public String getStatus() {
-        return "Server is running :)";
+    public ResponseEntity<String> getStatus() {
+        return new ResponseEntity<String>("Server is running :)", HttpStatus.OK);
     }
 
     /**
@@ -43,14 +43,16 @@ public class ExampleController {
         return matrixA.mmul(matrixB).toString();
     }
 
-    @PostMapping("/testa") 
-    public ResponseEntity<String> atos(@RequestBody String example) {
+    @PostMapping("/test") 
+    public ResponseEntity<String> test(@RequestBody String example) {
         System.out.println(example);
         return new ResponseEntity<String>(example, HttpStatus.ACCEPTED);
     }
 
     @PostMapping("/jblas")
-    public ResponseEntity<String> getArray(@RequestBody ExampleDTO example) {
+    public ResponseEntity<String> getArray(@RequestBody AlgorithmInputDTO example) {
+        System.out.println(example);
+
         return new ResponseEntity<String>(example.toString(), HttpStatus.ACCEPTED);
     }
 }
