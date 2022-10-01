@@ -12,13 +12,4 @@ public class AlgorithmInputDTO {
     private int algorithmS;
     private int algorithmN;
 
-    /*@Override
-    public String toString() {
-        String a = "";
-        for(int i = 0; i < arrayG.length; i++) {
-            a += arrayG[i] + " ";
-        }
-        return image + " " + algorithmS + " " + algorithmN + a;
-    }*/
-
 }
