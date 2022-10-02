@@ -32,7 +32,7 @@ public class Image {
             }
         }
 
-        File file = new File("./cgne.jpg");
+        File file = new File("./" + name);
         try {
             ImageIO.write(image, "jpg", file);
         } catch (IOException e) {

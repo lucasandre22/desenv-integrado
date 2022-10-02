@@ -50,13 +50,23 @@ public class CGNE implements Algorithm {
         return new AlgorithmOutput(f, i, (System.currentTimeMillis() - startTime));
     }
 
+    public static void printImage(FloatMatrix matrix, int columns) {
+        for(int i = 0; i < matrix.columns*matrix.rows; i++) {
+            System.out.print(matrix.get(i) + " ");
+            if((i+1) % columns == 0) {
+                System.out.print("\n");
+            }
+        }
+    }
+
     public static void main(String[] args) {
         FloatMatrix arrayG = CsvParser.readFloatMatrixFromCsvFile(
-                Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_2_G_MATRIX);
+                Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_2_G_MATRIX_2);
         FloatMatrix matrixH = CsvParser.readFloatMatrixFromCsvFile(
                 Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_2_H_MATRIX);
         Algorithm cgnr = new CGNE();
         AlgorithmOutput output = cgnr.run(matrixH, arrayG);
         Image.saveFloatMatrixToImage(output.getOutputMatrix(), 30, 30, "cgne");
+        printImage(output.getOutputMatrix(), 30);
     }
 }
