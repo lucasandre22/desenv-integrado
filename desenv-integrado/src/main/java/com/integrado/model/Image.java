@@ -34,7 +34,7 @@ public class Image {
 
         File file = new File("./" + name);
         try {
-            ImageIO.write(image, "jpg", file);
+            ImageIO.write(image, "bmp", file);
         } catch (IOException e) {
             e.printStackTrace();
         }

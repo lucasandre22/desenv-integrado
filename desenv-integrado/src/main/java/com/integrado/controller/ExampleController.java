@@ -27,7 +27,7 @@ import com.integrado.util.CsvParser;
 @RequestMapping
 public class ExampleController {
     FloatMatrix arrayG = CsvParser.readFloatMatrixFromCsvFile(
-            Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_2_G_MATRIX_2);
+            Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_2_G_MATRIX_1);
     FloatMatrix matrixH = CsvParser.readFloatMatrixFromCsvFile(
             Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_2_H_MATRIX);
 
