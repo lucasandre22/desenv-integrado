@@ -1,50 +1,68 @@
 package com.integrado.algorithm;
-
+import com.integrado.model.Image;
+import com.integrado.util.Constants;
+import com.integrado.util.CsvParser;
 import org.jblas.FloatMatrix;
-import org.jblas.JavaBlas;
-import org.jblas.NativeBlas;
+import lombok.Data;
+
 
 /**
  * 
  * Conjugate Gradient Method Normal Residual (Saad2003, p. 266)
  *
  */
+@Data
 public class CGNR implements Algorithm {
-
-    private final static int CONVERGENCE = 1000;
-
+    /**
+     *
+     * @return AlgorithmOutput object.
+     */
     public AlgorithmOutput run(FloatMatrix matrixH, FloatMatrix arrayG) {
-        FloatMatrix matrixHTransposed = matrixH.transpose();
+
         FloatMatrix f = FloatMatrix.zeros(1, 30*30);
-        FloatMatrix r = FloatMatrix.zeros(1, 30*30);
-        FloatMatrix p = FloatMatrix.zeros(30*30, 1);
-        //FloatMatrix to_be_multiplied = FloatMatrix.zeros(27904, 1);
-        FloatMatrix z = FloatMatrix.zeros(30*30, 1);;
+        FloatMatrix r = arrayG;
+        FloatMatrix z = matrixH.transpose().mmul(r);
+        FloatMatrix p = z;
 
+        FloatMatrix r_next;
+        FloatMatrix z_anterior = z;
 
-        int i = 0;
         long startTime = System.currentTimeMillis();
-        for(i = 0; i < CONVERGENCE; i++) {
+        int i = 1;
+        for(i = 1; i < Constants.CONVERGENCE; i++) {
             FloatMatrix w = matrixH.mmul(p);
-            float znorm2 = NativeBlas.snrm2(z.length, z.data, 0, 1);
-            float wnorm2 = NativeBlas.snrm2(z.length, w.data, 0, 1);
 
-            float alpha = (znorm2*znorm2)/(wnorm2*wnorm2);
+            float alpha = (z.norm2() * z.norm2()) / (w.norm2() * w.norm2());
 
-            f = f.add(p.mmul(alpha));
-            FloatMatrix r_next = r.sub(w.mmul(alpha));
-            z = matrixHTransposed.mmul(r_next);
+            f = f.add(p.mul(alpha));
+            r_next = r.sub(w.mul(alpha));
 
             if(verifyError(r, r_next)) {
                 System.out.println("Error achieved!");
                 break;
             }
 
-            float z1norm2 = NativeBlas.snrm2(z.length, z.data, 0, 1);
-            float beta = (z1norm2*z1norm2)/(znorm2*znorm2);
+            z = matrixH.transpose().mmul(r_next);
 
-            p = z.add(p.mmul(beta));
+            float beta = (z.norm2() * z.norm2()) / (z_anterior.norm2() * z_anterior.norm2());
+            p = z.add(p.mul(beta));
+
+            r = r_next;
+            z_anterior = z;
         }
+
+        System.out.println("Time to complete: " + (System.currentTimeMillis() - startTime));
         return new AlgorithmOutput(f, i, (System.currentTimeMillis() - startTime));
+    }
+
+
+    public static void main(String[] args) {
+        FloatMatrix arrayG = CsvParser.readFloatMatrixFromCsvFile(
+                Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_2_G_MATRIX_2);
+        FloatMatrix matrixH = CsvParser.readFloatMatrixFromCsvFile(
+                Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_2_H_MATRIX);
+        Algorithm cgnr = new CGNR();
+        AlgorithmOutput output = cgnr.run(matrixH, arrayG);
+        Image.saveFloatMatrixToImage(output.getOutputMatrix(), 30, 30, "cgnr");
     }
 }

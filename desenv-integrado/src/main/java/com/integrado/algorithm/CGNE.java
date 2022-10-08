@@ -61,8 +61,8 @@ public class CGNE implements Algorithm {
                 Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_2_G_MATRIX_2);
         FloatMatrix matrixH = CsvParser.readFloatMatrixFromCsvFile(
                 Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_2_H_MATRIX);
-        Algorithm cgnr = new CGNE();
-        AlgorithmOutput output = cgnr.run(matrixH, arrayG);
+        Algorithm cgne = new CGNE();
+        AlgorithmOutput output = cgne.run(matrixH, arrayG);
         Image.saveFloatMatrixToImage(output.getOutputMatrix(), 30, 30, "cgne");
     }
 }
