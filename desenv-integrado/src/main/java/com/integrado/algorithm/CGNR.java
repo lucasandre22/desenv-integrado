@@ -1,8 +1,10 @@
 package com.integrado.algorithm;
+import org.jblas.FloatMatrix;
+
 import com.integrado.model.Image;
 import com.integrado.util.Constants;
 import com.integrado.util.CsvParser;
-import org.jblas.FloatMatrix;
+
 import lombok.Data;
 
 
@@ -17,9 +19,10 @@ public class CGNR implements Algorithm {
      *
      * @return AlgorithmOutput object.
      */
-    public AlgorithmOutput run(FloatMatrix matrixH, FloatMatrix arrayG) {
+    public AlgorithmOutput run(FloatMatrix matrixH, FloatMatrix arrayG, Model model) {
 
-        FloatMatrix f = FloatMatrix.zeros(1, 30*30);
+        int outputImageLength = model == Model.one ? 60 : 30;
+        FloatMatrix f = FloatMatrix.zeros(1, outputImageLength*outputImageLength);
         FloatMatrix r = arrayG;
         FloatMatrix z = matrixH.transpose().mmul(r);
         FloatMatrix p = z;
@@ -52,17 +55,17 @@ public class CGNR implements Algorithm {
         }
 
         System.out.println("Time to complete: " + (System.currentTimeMillis() - startTime));
-        return new AlgorithmOutput(f, i, (System.currentTimeMillis() - startTime));
+        return new AlgorithmOutput(f, outputImageLength, i, (System.currentTimeMillis() - startTime));
     }
 
 
     public static void main(String[] args) {
         FloatMatrix arrayG = CsvParser.readFloatMatrixFromCsvFile(
-                Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_2_G_MATRIX_2);
+                Constants.MODEL_1_G_MATRIX);
         FloatMatrix matrixH = CsvParser.readFloatMatrixFromCsvFile(
-                Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_2_H_MATRIX);
+                Constants.MODEL_1_H_MATRIX);
         Algorithm cgnr = new CGNR();
-        AlgorithmOutput output = cgnr.run(matrixH, arrayG);
-        Image.saveFloatMatrixToImage(output.getOutputMatrix(), 30, 30, "cgnr");
+        AlgorithmOutput output = cgnr.run(matrixH, arrayG, Model.one);
+        Image.generateImageOutput(output, "cgnr");
     }
 }

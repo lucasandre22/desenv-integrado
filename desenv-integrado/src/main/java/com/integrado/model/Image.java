@@ -9,10 +9,17 @@ import javax.imageio.ImageIO;
 
 import org.jblas.FloatMatrix;
 
+import com.integrado.algorithm.AlgorithmOutput;
+
 import lombok.Data;
 
 @Data
 public class Image {
+    
+    public static void generateImageOutput(AlgorithmOutput output, String username) {
+        Image.saveFloatMatrixToImage(output.getOutputMatrix(), 
+                output.getImageLength(), output.getImageLength(), username);
+    }
 
     public static void saveFloatMatrixToImage(FloatMatrix matrix, int width, int height, String name) {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
@@ -32,7 +39,7 @@ public class Image {
             }
         }
 
-        File file = new File("./" + name);
+        File file = new File("./" + name + ".bmp");
         try {
             ImageIO.write(image, "bmp", file);
         } catch (IOException e) {
@@ -40,7 +47,7 @@ public class Image {
         }
     }
 
-    static float max_element(final float[] x, int n) {
+    private static float max_element(final float[] x, int n) {
         int r = 0;
         for (int i = 1; i < n; i++)
             if (x[i] > x[r])
@@ -48,7 +55,7 @@ public class Image {
         return x[r];
     }
 
-    static float min_element(final float[] x, int n) {
+    private static float min_element(final float[] x, int n) {
         int r = 0;
         for (int i = 1; i < n; i++)
             if (x[i] < x[r])

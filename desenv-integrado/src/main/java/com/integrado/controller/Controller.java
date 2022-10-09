@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.integrado.algorithm.Algorithm;
+import com.integrado.algorithm.Algorithm.Model;
 import com.integrado.algorithm.AlgorithmOutput;
 import com.integrado.algorithm.CGNE;
 import com.integrado.dto.AlgorithmInputDTO;
@@ -25,7 +26,7 @@ import com.integrado.util.CsvParser;
  */
 @RestController
 @RequestMapping
-public class ExampleController {
+public class Controller {
     FloatMatrix arrayG = CsvParser.readFloatMatrixFromCsvFile(
             Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_2_G_MATRIX_1);
     FloatMatrix matrixH = CsvParser.readFloatMatrixFromCsvFile(
@@ -64,8 +65,9 @@ public class ExampleController {
     public ResponseEntity<AlgorithmOutput> getArray(@RequestBody AlgorithmInputDTO example) {
         System.out.println(example);
         Algorithm cgne = new CGNE();
-        AlgorithmOutput output = cgne.run(matrixH, arrayG);
-        Image.saveFloatMatrixToImage(output.getOutputMatrix(), 30, 30, example.getUser());
+        AlgorithmOutput output = cgne.run(matrixH, arrayG, Model.one);
+        Image.generateImageOutput(output, example.getUser());
+
         return new ResponseEntity<AlgorithmOutput>(output, HttpStatus.OK);
     }
 }

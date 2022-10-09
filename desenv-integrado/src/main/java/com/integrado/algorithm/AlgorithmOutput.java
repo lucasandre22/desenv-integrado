@@ -10,6 +10,7 @@ import lombok.Data;
 @Data @AllArgsConstructor @JsonIgnoreProperties("outputMatrix")
 public class AlgorithmOutput {
     private FloatMatrix outputMatrix;
+    private int imageLength;
     private int totalIterations;
     private long timeToComplete;
     //cpu usage
