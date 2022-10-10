@@ -17,11 +17,16 @@ import lombok.Data;
 public class Image {
     
     public static void generateImageOutput(AlgorithmOutput output, String username) {
-        Image.saveFloatMatrixToImage(output.getOutputMatrix(), 
-                output.getImageLength(), output.getImageLength(), username);
+        String filename = username + "_" + output.getAlgorithm() + "_" +
+                              output.getDate() + "_" + output.getStartTime() + "_" +
+                              output.getDate() + "_" + output.getEndTime() + "_" +
+                              output.getPixelsLength() + "_" + output.getTotalIterations();
+
+        Image.saveFloatMatrixToImage(output.getOutputMatrix(),
+                output.getImageLength(), output.getImageLength(), filename);
     }
 
-    public static void saveFloatMatrixToImage(FloatMatrix matrix, int width, int height, String name) {
+    public static void saveFloatMatrixToImage(FloatMatrix matrix, int width, int height, String filename) {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
 
         final float max = max_element(matrix.data, width*height);
@@ -39,7 +44,7 @@ public class Image {
             }
         }
 
-        File file = new File("./" + name + ".bmp");
+        File file = new File("./" + filename + ".bmp");
         try {
             ImageIO.write(image, "bmp", file);
         } catch (IOException e) {

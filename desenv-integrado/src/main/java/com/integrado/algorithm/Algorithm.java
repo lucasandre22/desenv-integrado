@@ -22,4 +22,9 @@ public interface Algorithm {
         two;
     }
 
+    public enum AlgorithmType {
+        CGNE,
+        CGNR
+    }
+
 }

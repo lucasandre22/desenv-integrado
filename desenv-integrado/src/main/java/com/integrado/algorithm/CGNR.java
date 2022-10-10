@@ -1,6 +1,10 @@
 package com.integrado.algorithm;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import org.jblas.FloatMatrix;
 
+import com.integrado.algorithm.Algorithm.AlgorithmType;
 import com.integrado.model.Image;
 import com.integrado.util.Constants;
 import com.integrado.util.CsvParser;
@@ -20,7 +24,11 @@ public class CGNR implements Algorithm {
      * @return AlgorithmOutput object.
      */
     public AlgorithmOutput run(FloatMatrix matrixH, FloatMatrix arrayG, Model model) {
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");  
+        LocalDateTime start = LocalDateTime.now();
 
+        //define output image length by model
         int outputImageLength = model == Model.one ? 60 : 30;
         FloatMatrix f = FloatMatrix.zeros(1, outputImageLength*outputImageLength);
         FloatMatrix r = arrayG;
@@ -53,9 +61,13 @@ public class CGNR implements Algorithm {
             r = r_next;
             z_anterior = z;
         }
+        LocalDateTime finishTime = LocalDateTime.now();
 
         System.out.println("Time to complete: " + (System.currentTimeMillis() - startTime));
-        return new AlgorithmOutput(f, outputImageLength, i, (System.currentTimeMillis() - startTime));
+        return new AlgorithmOutput(f, AlgorithmType.CGNR, outputImageLength, 
+                outputImageLength*outputImageLength, dateFormatter.format(start), 
+                timeFormatter.format(start), timeFormatter.format(LocalDateTime.now()),
+                i, (System.currentTimeMillis() - startTime));
     }
 
 
