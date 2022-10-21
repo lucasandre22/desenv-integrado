@@ -34,7 +34,6 @@ public class CGNE implements Algorithm {
         FloatMatrix r = arrayG;
         FloatMatrix p = matrixH.transpose().mmul(r);
         FloatMatrix r_next;
-        System.out.println(matrixH.length);
 
         int i = 1;
         float r_dot = r.dot(r);

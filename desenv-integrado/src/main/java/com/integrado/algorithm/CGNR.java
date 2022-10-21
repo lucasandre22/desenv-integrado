@@ -8,6 +8,7 @@ import com.integrado.algorithm.Algorithm.AlgorithmType;
 import com.integrado.model.Image;
 import com.integrado.util.Constants;
 import com.integrado.util.CsvParser;
+import com.integrado.util.LoadMonitor;
 
 import lombok.Data;
 
@@ -72,6 +73,7 @@ public class CGNR implements Algorithm {
 
 
     public static void main(String[] args) {
+        new Thread(new LoadMonitor()).start();
         FloatMatrix arrayG = CsvParser.readFloatMatrixFromCsvFile(
                 Constants.MODEL_1_G_MATRIX);
         FloatMatrix matrixH = CsvParser.readFloatMatrixFromCsvFile(
