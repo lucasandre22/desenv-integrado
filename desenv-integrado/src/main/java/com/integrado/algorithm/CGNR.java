@@ -28,12 +28,13 @@ public class CGNR implements Algorithm {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");  
         LocalDateTime start = LocalDateTime.now();
+        FloatMatrix transpose = matrixH.transpose();
 
         //define output image length by model
         int outputImageLength = model == Model.one ? 60 : 30;
         FloatMatrix f = FloatMatrix.zeros(1, outputImageLength*outputImageLength);
         FloatMatrix r = arrayG;
-        FloatMatrix z = matrixH.transpose().mmul(r);
+        FloatMatrix z = transpose.mmul(r);
         FloatMatrix p = z;
 
         FloatMatrix r_next;
@@ -54,7 +55,7 @@ public class CGNR implements Algorithm {
                 break;
             }
 
-            z = matrixH.transpose().mmul(r_next);
+            z = transpose.mmul(r_next);
 
             float beta = (z.norm2() * z.norm2()) / (z_anterior.norm2() * z_anterior.norm2());
             p = z.add(p.mul(beta));

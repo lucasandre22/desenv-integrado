@@ -27,12 +27,13 @@ public class CGNE implements Algorithm {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");  
         LocalDateTime start = LocalDateTime.now();
+        FloatMatrix transpose = matrixH.transpose();
 
         //define output image length by model
         int outputImageLength = model == Model.one ? 60 : 30;
         FloatMatrix f = FloatMatrix.zeros(1, outputImageLength*outputImageLength);
         FloatMatrix r = arrayG;
-        FloatMatrix p = matrixH.transpose().mmul(r);
+        FloatMatrix p = transpose.mmul(r);
         FloatMatrix r_next;
 
         int i = 1;
@@ -55,7 +56,7 @@ public class CGNE implements Algorithm {
             new_r_dot = r_next.dot(r_next);
             beta = new_r_dot/r_dot;
             r_dot = new_r_dot;
-            p = matrixH.transpose().mmul(r_next).add(p.mmul(beta));
+            p = transpose.mmul(r_next).add(p.mmul(beta));
             r = r_next;
         }
 
