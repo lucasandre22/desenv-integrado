@@ -11,7 +11,7 @@ public class DesenvIntegradoApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(DesenvIntegradoApplication.class, args);
-        new Thread(new LoadMonitor()).start();
+        new Thread(new LoadMonitor(1000)).start();
     }
 
 }

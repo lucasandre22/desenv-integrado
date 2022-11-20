@@ -6,21 +6,35 @@ import com.sun.management.OperatingSystemMXBean;
 
 public class LoadMonitor implements Runnable {
 
+    private static String memoryUsage;
+    private static double cpuLoad = 0;
+    private long timeout;
+
+    public LoadMonitor(long timeout) {
+        this.timeout = timeout;
+    }
+
     @Override
     public void run() {
         while(true) {
             OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(
                     OperatingSystemMXBean.class);
-            System.out.println("Process cpu load: " + osBean.getProcessCpuLoad());
             double cpuLoad = ManagementFactory.getPlatformMXBean(
                     com.sun.management.OperatingSystemMXBean.class).getCpuLoad();
-            System.out.println("Cpu load: " + cpuLoad);
+            this.cpuLoad = cpuLoad;
             try {
-                Thread.sleep(1000);
+                Thread.sleep(timeout);
             } catch(Exception e) {
-                
+
             }
+            System.out.println(Runtime.getRuntime().freeMemory()/(1000*1000));
+            System.out.println("Meg used="+(Runtime.getRuntime().totalMemory()-
+                    Runtime.getRuntime().freeMemory())/(1000*1000)+"Mb");
         }
+    }
+
+    public static double getLoadAverage() {
+        return cpuLoad;
     }
 
 }

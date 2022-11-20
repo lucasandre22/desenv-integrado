@@ -1,5 +1,7 @@
 package com.integrado.util;
 
+import java.time.format.DateTimeFormatter;
+
 /**
  * 
  * Mathematical constants based on each model provided.
@@ -20,10 +22,12 @@ public class Constants {
     public static final String PATH_TO_MODEL_2_MATRIXES = "../model2/";
     public static final int MODEL_2_S = 436;
     public static final int MODEL_2_N = 64;
-    public static final String MODEL_2_G_MATRIX_1 = "g-30x30-1." + INPUT_FILE_TYPE;
-    public static final String MODEL_2_G_MATRIX_2 = "g-30x30-2." + INPUT_FILE_TYPE;
-    public static final String MODEL_2_H_MATRIX = "H-2." + INPUT_FILE_TYPE;
+    public static final String MODEL_2_G_MATRIX_1 = PATH_TO_MODEL_2_MATRIXES + "g-30x30-1." + INPUT_FILE_TYPE;
+    public static final String MODEL_2_G_MATRIX_2 = PATH_TO_MODEL_2_MATRIXES + "g-30x30-2." + INPUT_FILE_TYPE;
+    public static final String MODEL_2_H_MATRIX = PATH_TO_MODEL_2_MATRIXES + "H-2." + INPUT_FILE_TYPE;
 
     public static final float ERROR = 0.0001f;
 
+    public static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    public static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss"); 
 }

@@ -23,17 +23,14 @@ public class CGNE implements Algorithm {
      * 
      * @return AlgorithmOutput object.
      */
-    public AlgorithmOutput run(FloatMatrix matrixH, FloatMatrix arrayG, Model model) {
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");  
+    public AlgorithmOutput run(FloatMatrix arrayG, Model model) {
         LocalDateTime start = LocalDateTime.now();
-        FloatMatrix transpose = matrixH.transpose();
 
         //define output image length by model
         int outputImageLength = model == Model.one ? 60 : 30;
         FloatMatrix f = FloatMatrix.zeros(1, outputImageLength*outputImageLength);
         FloatMatrix r = arrayG;
-        FloatMatrix p = transpose.mmul(r);
+        FloatMatrix p = AlgorithmMatrixes.getMatrixTranspose(model).mmul(r);
         FloatMatrix r_next;
 
         int i = 1;
@@ -46,7 +43,7 @@ public class CGNE implements Algorithm {
         for(; i < Constants.CONVERGENCE; i++) {
             alpha = r_dot/p.dot(p);
             f = f.add(p.mmul(alpha));
-            r_next = r.sub(matrixH.mmul(alpha).mmul(p));
+            r_next = r.sub(AlgorithmMatrixes.getMatrixH(model).mmul(alpha).mmul(p));
 
             if(verifyError(r, r_next)) {
                 System.out.println("Error achieved!");
@@ -56,15 +53,15 @@ public class CGNE implements Algorithm {
             new_r_dot = r_next.dot(r_next);
             beta = new_r_dot/r_dot;
             r_dot = new_r_dot;
-            p = transpose.mmul(r_next).add(p.mmul(beta));
+            p = AlgorithmMatrixes.getMatrixTranspose(model).mmul(r_next).add(p.mmul(beta));
             r = r_next;
         }
 
         System.out.println("Time to complete: " + (System.currentTimeMillis() - startTime));
         
         return new AlgorithmOutput(f, AlgorithmType.CGNE, outputImageLength, 
-                outputImageLength*outputImageLength, dateFormatter.format(start), 
-                timeFormatter.format(start), timeFormatter.format(LocalDateTime.now()),
+                outputImageLength*outputImageLength, Constants.dateFormatter.format(start), 
+                Constants.timeFormatter.format(start), Constants.timeFormatter.format(LocalDateTime.now()),
                 i, (System.currentTimeMillis() - startTime));
     }
 
@@ -72,7 +69,7 @@ public class CGNE implements Algorithm {
         FloatMatrix arrayG = CsvParser.readFloatMatrixFromCsvFile(Constants.MODEL_1_G_MATRIX);
         FloatMatrix matrixH = CsvParser.readFloatMatrixFromCsvFile(Constants.MODEL_1_H_MATRIX);
         Algorithm cgne = new CGNE();
-        AlgorithmOutput output = cgne.run(matrixH, arrayG, Model.one);
+        AlgorithmOutput output = cgne.run(arrayG, Model.one);
         Image.generateImageOutput(output, "cgne");
     }
 }

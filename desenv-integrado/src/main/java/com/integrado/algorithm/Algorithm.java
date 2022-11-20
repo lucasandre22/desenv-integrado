@@ -1,12 +1,15 @@
 package com.integrado.algorithm;
 
+import java.time.format.DateTimeFormatter;
+
 import org.jblas.FloatMatrix;
 
 import com.integrado.util.Constants;
+import com.integrado.util.CsvParser;
 
-public interface Algorithm {
+public interface Algorithm { 
 
-    public AlgorithmOutput run(FloatMatrix matrixH, FloatMatrix arrayG, Model model);
+    public AlgorithmOutput run(FloatMatrix arrayG, Model model);
     
     public default boolean verifyError(FloatMatrix r, FloatMatrix r_next) {
         System.out.println("Current error: " + Math.abs(r_next.norm2() - r.norm2()));

@@ -1,6 +1,5 @@
 package com.integrado.controller;
 
-import org.jblas.FloatMatrix;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,12 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.integrado.algorithm.Algorithm;
 import com.integrado.algorithm.Algorithm.Model;
+import com.integrado.algorithm.AlgorithmMatrixes;
 import com.integrado.algorithm.AlgorithmOutput;
-import com.integrado.algorithm.CGNR;
+import com.integrado.algorithm.CGNE;
 import com.integrado.dto.AlgorithmInputDTO;
 import com.integrado.model.Image;
-import com.integrado.util.Constants;
-import com.integrado.util.CsvParser;
+import com.integrado.util.LoadMonitor;
 
 /**
  * 
@@ -26,11 +25,8 @@ import com.integrado.util.CsvParser;
 @RestController
 @RequestMapping
 public class Controller {
-    FloatMatrix arrayG = CsvParser.readFloatMatrixFromCsvFile(
-            Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_1_G_MATRIX);
-    FloatMatrix matrixH = CsvParser.readFloatMatrixFromCsvFile(
-            Constants.PATH_TO_MODEL_2_MATRIXES + Constants.MODEL_1_H_MATRIX);
 
+    AlgorithmMatrixes al = new AlgorithmMatrixes();
     /**
      * Get status from server.
      * 
@@ -41,18 +37,32 @@ public class Controller {
         return new ResponseEntity<String>("Server is running :)", HttpStatus.OK);
     }
 
-    @GetMapping("/startClient")
-    public ResponseEntity<String> startClient() {
+    @GetMapping("/report")
+    public ResponseEntity<String> getReport() {
         return new ResponseEntity<String>("Server is running :)", HttpStatus.OK);
     }
 
-    @PostMapping("/jblas")
+    @GetMapping("/performance")
+    public ResponseEntity<Double> startClient() {
+        return new ResponseEntity<Double>(LoadMonitor.getLoadAverage(), HttpStatus.OK);
+    }
+
+    @PostMapping("/process")
     public ResponseEntity<AlgorithmOutput> getArray(@RequestBody AlgorithmInputDTO example) {
-        System.out.println(example);
-        Algorithm cgne = new CGNR();
-        AlgorithmOutput output = cgne.run(matrixH, arrayG, Model.one);
+        Algorithm cgne = new CGNE();
+        AlgorithmOutput output = cgne.run(AlgorithmMatrixes.arrayGone, Model.one);
         Image.generateImageOutput(output, example.getUser());
 
         return new ResponseEntity<AlgorithmOutput>(output, HttpStatus.OK);
     }
 }
+//o algoritmo tem q ser capaz de se adaptar
+//trabalhar com limiares
+
+//ver se o pc tem memoria suficiente para carregar as duas matrizes, se nao, 
+//carrega dinamicamente
+
+//tentar compactar matriz na memoria?
+//tem muitos zeros na matriz, pesquisar matriz esparsa, pesquisar EJML;
+
+//implementar rajada

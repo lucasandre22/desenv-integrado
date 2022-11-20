@@ -24,17 +24,14 @@ public class CGNR implements Algorithm {
      *
      * @return AlgorithmOutput object.
      */
-    public AlgorithmOutput run(FloatMatrix matrixH, FloatMatrix arrayG, Model model) {
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");  
+    public AlgorithmOutput run(FloatMatrix arrayG, Model model) {
         LocalDateTime start = LocalDateTime.now();
-        FloatMatrix transpose = matrixH.transpose();
 
         //define output image length by model
         int outputImageLength = model == Model.one ? 60 : 30;
         FloatMatrix f = FloatMatrix.zeros(1, outputImageLength*outputImageLength);
         FloatMatrix r = arrayG;
-        FloatMatrix z = transpose.mmul(r);
+        FloatMatrix z = AlgorithmMatrixes.getMatrixTranspose(model).mmul(r);
         FloatMatrix p = z;
 
         FloatMatrix r_next;
@@ -43,7 +40,7 @@ public class CGNR implements Algorithm {
         long startTime = System.currentTimeMillis();
         int i = 1;
         for(i = 1; i < Constants.CONVERGENCE; i++) {
-            FloatMatrix w = matrixH.mmul(p);
+            FloatMatrix w = AlgorithmMatrixes.getMatrixH(model).mmul(p);
 
             float alpha = (z.norm2() * z.norm2()) / (w.norm2() * w.norm2());
 
@@ -51,11 +48,11 @@ public class CGNR implements Algorithm {
             r_next = r.sub(w.mul(alpha));
 
             if(verifyError(r, r_next)) {
-                System.out.println("Error achieved!");
+                //System.out.println("Error achieved!");
                 break;
             }
 
-            z = transpose.mmul(r_next);
+            z = AlgorithmMatrixes.getMatrixTranspose(model).mmul(r_next);
 
             float beta = (z.norm2() * z.norm2()) / (z_anterior.norm2() * z_anterior.norm2());
             p = z.add(p.mul(beta));
@@ -67,20 +64,20 @@ public class CGNR implements Algorithm {
 
         System.out.println("Time to complete: " + (System.currentTimeMillis() - startTime));
         return new AlgorithmOutput(f, AlgorithmType.CGNR, outputImageLength, 
-                outputImageLength*outputImageLength, dateFormatter.format(start), 
-                timeFormatter.format(start), timeFormatter.format(LocalDateTime.now()),
+                outputImageLength*outputImageLength, Constants.dateFormatter.format(start), 
+                Constants.timeFormatter.format(start), Constants.timeFormatter.format(LocalDateTime.now()),
                 i, (System.currentTimeMillis() - startTime));
     }
 
 
     public static void main(String[] args) {
-        new Thread(new LoadMonitor()).start();
+        new Thread(new LoadMonitor(1000)).start();
         FloatMatrix arrayG = CsvParser.readFloatMatrixFromCsvFile(
                 Constants.MODEL_1_G_MATRIX);
         FloatMatrix matrixH = CsvParser.readFloatMatrixFromCsvFile(
                 Constants.MODEL_1_H_MATRIX);
         Algorithm cgnr = new CGNR();
-        AlgorithmOutput output = cgnr.run(matrixH, arrayG, Model.one);
+        AlgorithmOutput output = cgnr.run(arrayG, Model.one);
         Image.generateImageOutput(output, "cgnr");
     }
 }
