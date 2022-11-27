@@ -1,128 +1,118 @@
-const request = require('request');
-const fs = require('fs');
+import { readFileSync } from "fs";
+import fetch from 'node-fetch';
 
-ip = 'host.docker.internal';
 
-port = 5777;
+const users = [
+        {"user": "A", "algorithm": "CGNR", "model":"one", "file": "model1/G-1.csv", "N": 64, "S": 794, "gain": true},
+        {"user": "B", "algorithm": "CGNR", "model":"one", "file": "model1/G-1.csv", "N": 64, "S": 794, "gain": false},
+        {"user": "C", "algorithm": "CGNR", "model":"one", "file": "model1/G-2.csv", "N": 64, "S": 794, "gain": true},
+        {"user": "D", "algorithm": "CGNR", "model":"one", "file": "model1/G-2.csv", "N": 64, "S": 794, "gain": false},
+      //{"user": "E", "algorithm": "CGNR", "model":"two", "file": "model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": true},
+      //{"user": "F", "algorithm": "CGNR", "model":"two", "file": "model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": false},
+        {"user": "G", "algorithm": "CGNR", "model":"two", "file": "model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": true},
+        {"user": "H", "algorithm": "CGNR", "model":"two", "file": "model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": false},
 
-console.log(ip);
+        {"user": "I", "algorithm": "CGNE", "model":"one", "file": "model1/G-1.csv", "N": 64, "S": 794, "gain": true},
+        {"user": "J", "algorithm": "CGNE", "model":"one", "file": "model1/G-1.csv", "N": 64, "S": 794, "gain": false},
+        {"user": "K", "algorithm": "CGNE", "model":"one", "file": "model1/G-2.csv", "N": 64, "S": 794, "gain": true},
+        {"user": "L", "algorithm": "CGNE", "model":"one", "file": "model1/G-2.csv", "N": 64, "S": 794, "gain": false},
+      //{"user": "M", "algorithm": "CGNE", "model":"two", "file": "model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": true},
+      //{"user": "N", "algorithm": "CGNE", "model":"two", "file": "model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": false},
+        {"user": "O", "algorithm": "CGNE", "model":"two", "file": "model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": true},
+        {"user": "P", "algorithm": "CGNE", "model":"two", "file": "model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": false}
+]
 
-const imageDataMap = new Map([
-    [1, { "image": "g-30x30-1.csv", "model": "one", "S": 1, "N": 1}],
-    [2, { "image": "g-30x30-2.csv", "model": "one", "S": 1, "N": 1 }],
-    [3, { "image": "G-1.csv", "model": "two", "S": 1, "N": 1 }]
-]);
-
-//TODO read array from csv
-function csvToArray(str, delimiter = ",") {
-    const headers = str.slice(0, str.indexOf("\n")).split(delimiter);
-    const rows = str.slice(str.indexOf("\n") + 1).split("\n");
-    const arr = rows.map(function (row) {
-      const values = row.split(delimiter);
-      const el = headers.reduce(function (object, header, index) {
-        object[header] = values[index];
-        return object;
-      }, {});
-      return el;
-    });
-    return arr;
+function readCSV(user){
+    const data = readFileSync(user.file, 'utf-8');
+    return data;
 }
 
-async function lala(data) {
-    fs.readFile("../../model" + model == "one" ? "1" : "2" + image, 'utf8', (err, data) => {
-        if (err) {
-          console.error(err);
-          return;
-        }
-        
-    });
-    let CSVToArray = (data, delimiter = ',', omitFirstRow = false) =>
-        data
-        .slice(omitFirstRow ? data.indexOf('\n') + 1 : 0)
-        .split('\n')
-        .map(v => v.split(delimiter));
+function getRandomUser(){
+    const randomIndex = Math.floor(Math.random() * users.length);
+    const user = users[randomIndex];
+    return user;
 }
 
-function runSignalGain(array, S, N) {
-    for(let c = 0; c < N; c++) {
-        for(let l = 0; l < S; l++) {
-            let gain = 100 + (1/20) * l * Math.sqrt(l);
-            array[c+(l*S)] = array[c+(l*S)] * gain;
+function signalGain(arrayG, N, S) {
+    for(let i = 0; i < N; i++) {
+        for(let j = 0; j < S; j++) {
+            let gain = 100 + (1/20) * j * Math.sqrt(j);
+            let index = i + (j*S);
+            arrayG[index] = arrayG[index] * gain;
         }
     }
 }
 
-//generates from 0 to max
-function generateRandomInteger(max) {
-    return Math.floor(Math.random() * max);
-}
+async function getImage() {
+    const url = "http://localhost:5777/process"
+    const user = getRandomUser();
+    const userName = user.user;
+    const arrayG = readCSV(user);
+    const algorithm = user.algorithm;
+    const model = user.model;
 
-function randomizeDuo(first, second) {
-    console.log("first!");
-    return generateRandomInteger(2) == 1 ? first : second;
-}
+   // if(user.gain){
+        signalGain(arrayG, user.N, user.S);
+    //}
 
-function randomize(array) {
-    return array[generateRandomInteger(array.length)];
-}
-
-function randomizeUser() {
-    return randomize(["Lucas", "Vitor", "Leila", "Guto", "Arroz", "Peter", "Park", "Urubu", "Bitcoin", "Abigail", "Leo",
-                    "Giulia", "Flamingo", "Post", "Regia", "Oister"]);
-}
-
-function randomizeImage(signalGain) {
-    let imageData = imageDataMap.get(generateRandomInteger(3) + 1);
-    if(signalGain) {
-        runSignalGain(imageData.array, imageData.S, imageData.N);
-    }
-    let arrayG = imageData.image;
-    let model = imageData.model;
-    return { arrayG, model };
-}
-
-function buildRequest(mapping) {
-    let user = randomizeUser();
-    let algorithm = randomizeDuo("CGNE", "CGNR");
-    let signalGain = randomize([ true, false ]);
-    let { arrayG, model } = randomizeImage(signalGain);
-    return {
-        url: "http://" + ip + ":" + port + "/" + mapping,
+    await fetch(url, {
         method: 'POST',
-        headers: 'Content-Type: application/json',
+        headers:  {'Content-Type': 'application/json'},
         json: true,
-        body: {
-            user,
-            arrayG,
-            algorithm,
-            model
-        }
-    };
-}
-
-//TODO
-function randomizeTimeout() {
-    return 1000;
-}
-
-async function doRequest() {
-    let current_request = buildRequest("jblas");
-    console.log(current_request);
-    request(current_request, function (error, response, body) {
-        if(error) {
-            return -1;
-        } else if(response) {
-            console.log("response status: " + response.statusCode);
-        }
-        return response.statusCode;
+        body: JSON.stringify({userName, arrayG, algorithm, model})
+    }).then(response => response.json())
+    .then(jsonResponse => {
+      console.log(jsonResponse);
     });
 }
 
-async function waitServerRun() {
-    while(true) {
-        await doRequest();
-        await new Promise(resolve => setTimeout(resolve, randomizeTimeout()));
-    }
+
+
+async function getReport(){
+    const url = "http://localhost:5777/" + "report"
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    }).then(response => response.text())
+    .then(text => console.log(text))
 }
 
-waitServerRun();
+async function getStatus(){
+    const url = "http://localhost:5777/" + "status"
+
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    }).then(response => response.text())
+    .then(text => console.log(text))
+}
+
+/*(async () => {
+    const requestsNumber = 2;
+    let curentRequests = 0;
+    const end = curentRequests + requestsNumber;
+    const concurrentReq = new Array(requestsNumber);
+    for (let index = curentRequests; index < end; index++) {
+        console.log(`sending request ${curentRequests}...`);
+        concurrentReq.push(getStatus());
+        curentRequests++;
+    }
+    await Promise.all(concurrentReq);
+    console.log(`requests ${curentRequests - requestsNumber}-${curentRequests} done.`)
+        
+    
+})();
+*/
+//readCSV(getRandomUser());
+async function teste() {
+    const url = "http://localhost:5777/teste";
+    return await fetch(url, {
+        method: 'POST',
+    })
+}
+
+await getImage();
