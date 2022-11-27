@@ -37,6 +37,11 @@ public class Controller {
         return new ResponseEntity<String>("Server is running :)", HttpStatus.OK);
     }
 
+    @PostMapping("/teste") //specify which address is going to call this method
+    public ResponseEntity<String> get(int teste) {
+        return new ResponseEntity<String>("Server is running :)", HttpStatus.OK);
+    }
+
     @GetMapping("/report")
     public ResponseEntity<String> getReport() {
         return new ResponseEntity<String>("Server is running :)", HttpStatus.OK);

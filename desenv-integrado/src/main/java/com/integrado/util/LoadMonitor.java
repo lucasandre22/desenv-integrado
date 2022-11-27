@@ -30,6 +30,14 @@ public class LoadMonitor implements Runnable {
             System.out.println(Runtime.getRuntime().freeMemory()/(1000*1000));
             System.out.println("Meg used="+(Runtime.getRuntime().totalMemory()-
                     Runtime.getRuntime().freeMemory())/(1000*1000)+"Mb");
+            long freeMemory = Runtime.getRuntime().freeMemory();
+            System.out.println("Free memory in JVM: " + freeMemory/(1000*1000));
+     
+            long maxMemory = Runtime.getRuntime().maxMemory();
+            System.out.println("Max memory in JVM: " + maxMemory/(1000*1000));
+     
+            long totalMemory = Runtime.getRuntime().totalMemory();
+            System.out.println("Total memory in JVM: " + totalMemory/(1000*1000));
         }
     }
 

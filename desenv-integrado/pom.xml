@@ -53,6 +53,11 @@
 		   <artifactId>opencsv</artifactId>
 		   <version>5.5</version>
 		</dependency>
+		<dependency>
+          <groupId>org.ejml</groupId>
+          <artifactId>ejml-all</artifactId>
+          <version>0.41</version>
+        </dependency>
 	</dependencies>
 
 	<build>
@@ -60,6 +65,12 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+                    <executable>true</executable>
+                    <jvmArguments>
+                        -Xmx4g
+                    </jvmArguments>
+                </configuration>
 			</plugin>
 		</plugins>
 	</build>

@@ -27,9 +27,9 @@ public class AlgorithmMatrixes {
 
     public static FloatMatrix getMatrixTranspose(Model model) {
         if(model.equals(Model.one)) {
-            //if(matrixHfirstTranspose == null)
-                //matrixHfirstTranspose = matrixHone.transpose();
-            return matrixHone.transpose();
+            if(matrixHfirstTranspose == null)
+                matrixHfirstTranspose = matrixHone.transpose();
+            return matrixHfirstTranspose;
         }
         if(matrixHsecondTranspose == null)
             matrixHsecondTranspose = matrixHtwo.transpose();
