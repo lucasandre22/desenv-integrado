@@ -15,15 +15,9 @@ import lombok.Data;
 
 @Data
 public class Image {
-    
-    public static void generateImageOutput(AlgorithmOutput output, String username) {
-        String filename = username + "_" + output.getAlgorithm() + "_" +
-              output.getDate() + "_" + output.getStartTime() + "_" +
-              output.getDate() + "_" + output.getEndTime() + "_" +
-              output.getPixelsLength() + "_" + output.getTotalIterations();
 
-        Image.saveFloatMatrixToImage(output.getOutputMatrix(),
-                output.getImageLength(), output.getImageLength(), filename);
+    public static void generateImageOutput(FloatMatrix output, int length, String filename) {
+        Image.saveFloatMatrixToImage(output, length, length, filename);
     }
 
     public static void saveFloatMatrixToImage(FloatMatrix matrix, int width, int height, String filename) {

@@ -1,7 +1,5 @@
 package com.integrado.algorithm;
 
-import org.jblas.FloatMatrix;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.integrado.algorithm.Algorithm.AlgorithmType;
 
@@ -10,8 +8,7 @@ import lombok.Data;
 
 @Data @AllArgsConstructor @JsonIgnoreProperties("outputMatrix")
 public class AlgorithmOutput {
-    private FloatMatrix outputMatrix;
-    private String matrixPath;
+    private String image;
     private AlgorithmType algorithm;
     private int imageLength;
     private int pixelsLength;
@@ -23,4 +20,12 @@ public class AlgorithmOutput {
 
     //cpu usage
     //memory usage
+
+    public String setAndGetImageName(String username) {
+        this.image = username + "_" + this.getAlgorithm() + "_" +
+                this.getDate() + "_" + this.getStartTime() + "_" +
+                this.getDate() + "_" + this.getEndTime() + "_" +
+                this.getPixelsLength() + "_" + this.getTotalIterations() + ".bmp";
+        return image;
+    }
 }

@@ -58,19 +58,28 @@ public class ApplicationController {
 
     @PostMapping("/process")
     public ResponseEntity<AlgorithmOutput> process(@RequestBody AlgorithmInputDTO algorithmInput) throws InterruptedException, IOException {
-        AlgorithmOutput output = null;
-        output = runAlgorithm(algorithmInput);
-        output.setOutputMatrix(null);
+        AlgorithmOutput output = runAlgorithm(algorithmInput);
         return new ResponseEntity<AlgorithmOutput>(output, HttpStatus.OK);
     }
     
     public static AlgorithmOutput runAlgorithm(AlgorithmInputDTO algorithmInput) {
         Algorithm algorithm = getAlgorithmInstance(algorithmInput.getType());
-        AlgorithmOutput output = algorithm.run(new FloatMatrix(algorithmInput.getArrayG()), algorithmInput);
+        FloatMatrix arrayG = new FloatMatrix(algorithmInput.getArrayG());
+        System.out.println("LENGTH: " + arrayG.length);
+        System.out.println("LENGTH array: " + algorithmInput.getArrayG().length);
+        AlgorithmOutput output = algorithm.run(arrayG, algorithmInput);
 
         //call garbage collector in order to free some memory
         System.gc();
         return output;
+
+        //matrix length: 189724 ERROR (
+        //../model2/G-2.csv 50816 OK
+        //../model2/g-30x30-2.csv 189724
+        //../model1/G-1.csv 629706 ERROR
+        //../model2/G-2.csv 629706 ERROR
+
+        //matrix length: 27904 OK
     }
 
     public static Algorithm getAlgorithmInstance(AlgorithmType type) {

@@ -64,14 +64,13 @@ public class CGNE implements Algorithm {
             r = r_next;
         }
 
-        System.out.println("Time to complete: " + (System.currentTimeMillis() - startTime));
-        LocalDateTime finishTime = LocalDateTime.now();
-
-        AlgorithmOutput output = new AlgorithmOutput(f, algorithmInput.getUser(), AlgorithmType.CGNR, outputImageLength, 
+        AlgorithmOutput output = new AlgorithmOutput("", AlgorithmType.CGNR, outputImageLength, 
                 outputImageLength*outputImageLength, Constants.dateFormatter.format(start), 
                 Constants.timeFormatter.format(start), Constants.timeFormatter.format(LocalDateTime.now()),
                 i, (System.currentTimeMillis() - startTime));
-        Image.generateImageOutput(output, algorithmInput.getUser());
+
+        String imageFilename = output.setAndGetImageName(algorithmInput.getUser());
+        Image.generateImageOutput(f, outputImageLength, imageFilename);
         return output;
     }
 

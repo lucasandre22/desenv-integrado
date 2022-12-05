@@ -20,10 +20,9 @@ public class DesenvIntegradoApplication {
             AlgorithmMatrixes.matrixHone = FloatMatrix.loadCSVFile(Constants.MODEL_1_H_MATRIX);
             AlgorithmMatrixes.matrixHtwo = FloatMatrix.loadCSVFile(Constants.MODEL_2_H_MATRIX);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        new Thread(new LoadMonitor(5000)).start();
+        //new Thread(new LoadMonitor(5000)).start();
     }
 
     public static void seeAvailableMemory() {

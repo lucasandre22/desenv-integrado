@@ -34,7 +34,7 @@ public class CGNR implements Algorithm {
         int outputImageLength = model == Model.one ? 60 : 30;
         FloatMatrix f = FloatMatrix.zeros(1, outputImageLength*outputImageLength);
         FloatMatrix r = arrayG;
-        FloatMatrix z = AlgorithmMatrixes.getMatrixTranspose(model).mmul(r);
+        FloatMatrix z = AlgorithmMatrixes.getMatrixH(model).transpose().mmul(r);
         FloatMatrix p = z;
 
         FloatMatrix r_next;
@@ -63,12 +63,14 @@ public class CGNR implements Algorithm {
             r = r_next;
             z_anterior = z;
         }
-        LocalDateTime finishTime = LocalDateTime.now();
-        AlgorithmOutput output = new AlgorithmOutput(f, algorithmInput.getUser(), AlgorithmType.CGNR, outputImageLength, 
+
+        AlgorithmOutput output = new AlgorithmOutput("", AlgorithmType.CGNR, outputImageLength, 
                 outputImageLength*outputImageLength, Constants.dateFormatter.format(start), 
                 Constants.timeFormatter.format(start), Constants.timeFormatter.format(LocalDateTime.now()),
                 i, (System.currentTimeMillis() - startTime));
-        Image.generateImageOutput(output, algorithmInput.getUser());
+
+        String imageFilename = output.setAndGetImageName(algorithmInput.getUser());
+        Image.generateImageOutput(f, outputImageLength, imageFilename);
         return output;
     }
 
@@ -81,6 +83,5 @@ public class CGNR implements Algorithm {
                 Constants.MODEL_1_H_MATRIX);
         Algorithm cgnr = new CGNR();
         AlgorithmOutput output = cgnr.run(arrayG, null);
-        Image.generateImageOutput(output, "cgnr");
     }
 }

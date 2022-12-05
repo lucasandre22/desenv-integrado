@@ -6,18 +6,18 @@ import { parse } from 'csv-parse';
 const users = [
         {"user": "A", "algorithm": "CGNR", "model":"one", "file": "../model1/G-1.csv", "N": 64, "S": 794, "gain": true},
         {"user": "B", "algorithm": "CGNR", "model":"one", "file": "../model1/G-1.csv", "N": 64, "S": 794, "gain": false},
-        {"user": "C", "algorithm": "CGNR", "model":"one", "file": "../model1/G-2.csv", "N": 64, "S": 794, "gain": true},
-        {"user": "D", "algorithm": "CGNR", "model":"one", "file": "../model1/G-2.csv", "N": 64, "S": 794, "gain": false},
-      //{"user": "E", "algorithm": "CGNR", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": true},
-      //{"user": "F", "algorithm": "CGNR", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": false},
+        {"user": "C", "algorithm": "CGNR", "model":"one", "file": "../model2/G-2.csv", "N": 64, "S": 794, "gain": true},
+        {"user": "D", "algorithm": "CGNR", "model":"one", "file": "../model2/G-2.csv", "N": 64, "S": 794, "gain": false},
+        {"user": "E", "algorithm": "CGNR", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": true},
+        {"user": "F", "algorithm": "CGNR", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": false},
         {"user": "G", "algorithm": "CGNR", "model":"two", "file": "../model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": true},
         {"user": "H", "algorithm": "CGNR", "model":"two", "file": "../model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": false},
         {"user": "I", "algorithm": "CGNE", "model":"one", "file": "../model1/G-1.csv", "N": 64, "S": 794, "gain": true},
         {"user": "J", "algorithm": "CGNE", "model":"one", "file": "../model1/G-1.csv", "N": 64, "S": 794, "gain": false},
-        {"user": "K", "algorithm": "CGNE", "model":"one", "file": "../model1/G-2.csv", "N": 64, "S": 794, "gain": true},
-        {"user": "L", "algorithm": "CGNE", "model":"one", "file": "../model1/G-2.csv", "N": 64, "S": 794, "gain": false},
-      //{"user": "M", "algorithm": "CGNE", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": true},
-      //{"user": "N", "algorithm": "CGNE", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": false},
+        {"user": "K", "algorithm": "CGNE", "model":"one", "file": "../model2/G-2.csv", "N": 64, "S": 794, "gain": true},
+        {"user": "L", "algorithm": "CGNE", "model":"one", "file": "../model2/G-2.csv", "N": 64, "S": 794, "gain": false},
+        {"user": "M", "algorithm": "CGNE", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": true},
+        {"user": "N", "algorithm": "CGNE", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": false},
         {"user": "O", "algorithm": "CGNE", "model":"two", "file": "../model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": true},
         {"user": "P", "algorithm": "CGNE", "model":"two", "file": "../model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": false}
 ]
@@ -45,22 +45,18 @@ async function getImage() {
     const algorithm = user.algorithm;
     const model = user.model;
 
-    console.log(user.file);
+    console.log(user.file + " " + userName);
     let arrayG = []
 
     fs.createReadStream(user.file)
-    .pipe(parse({ delimiter: ",", from_line: 2 }))
+    .pipe(parse({ delimiter: "," }))
     .on("data", function (row) {
         arrayG.push(row[0]);
-        console.log(row.length);
     })
     .on("end", async function () {
         if(user.gain){
-            signalGain(arrayG, user.N, user.S);
+            //signalGain(arrayG, user.N, user.S); TODO error
         }
-    
-        console.log({userName, arrayG, algorithm, model});
-    
         await fetch(url, {
             method: 'POST',
             headers:  {'Content-Type': 'application/json'},
@@ -75,8 +71,6 @@ async function getImage() {
     .on("error", function (error) {
         console.log(error.message);
     });
-    console.log("lala");
-
 }
 
 async function getReport(){
