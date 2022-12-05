@@ -69,7 +69,7 @@ public class CGNR implements Algorithm {
                 Constants.timeFormatter.format(start), Constants.timeFormatter.format(LocalDateTime.now()),
                 i, (System.currentTimeMillis() - startTime));
 
-        String imageFilename = output.setAndGetImageName(algorithmInput.getUser());
+        String imageFilename = output.setAndGetImageName(algorithmInput.getUserName());
         Image.generateImageOutput(f, outputImageLength, imageFilename);
         return output;
     }
