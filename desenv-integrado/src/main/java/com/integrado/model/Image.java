@@ -18,9 +18,9 @@ public class Image {
     
     public static void generateImageOutput(AlgorithmOutput output, String username) {
         String filename = username + "_" + output.getAlgorithm() + "_" +
-                              output.getDate() + "_" + output.getStartTime() + "_" +
-                              output.getDate() + "_" + output.getEndTime() + "_" +
-                              output.getPixelsLength() + "_" + output.getTotalIterations();
+              output.getDate() + "_" + output.getStartTime() + "_" +
+              output.getDate() + "_" + output.getEndTime() + "_" +
+              output.getPixelsLength() + "_" + output.getTotalIterations();
 
         Image.saveFloatMatrixToImage(output.getOutputMatrix(),
                 output.getImageLength(), output.getImageLength(), filename);
@@ -29,6 +29,7 @@ public class Image {
     public static void saveFloatMatrixToImage(FloatMatrix matrix, int width, int height, String filename) {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
 
+        //Transform the interval of the image
         final float max = max_element(matrix.data, width*height);
         final float min = min_element(matrix.data, width*height);
         final float den = max - min;

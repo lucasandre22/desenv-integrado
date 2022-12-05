@@ -1,6 +1,8 @@
 package com.integrado.util;
 
 import java.io.FileReader;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +40,8 @@ public class CsvParser {
     public static FloatMatrix readFloatMatrixFromCsvFile(String matrixName) {
         List<float[]> matrixLines = new ArrayList<float[]>();
         float[][] matrixDouble;
+        long start = System.currentTimeMillis();
+        NumberFormat formatter = new DecimalFormat("#0.00000");
 
         try (CSVReader csvReader = new CSVReader(new FileReader(matrixName))) {
             for(String[] values = csvReader.readNext(); values != null; values = csvReader.readNext()) {
@@ -56,6 +60,8 @@ public class CsvParser {
         for(float[] line: matrixLines) {
             matrixDouble[i++] = line;
         }
+
+        System.out.print("Total time: " + formatter.format((System.currentTimeMillis() - start) / 1000d) + " seconds");
         return new FloatMatrix(matrixDouble);
     }
 

@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter;
 import org.jblas.FloatMatrix;
 
 import com.integrado.algorithm.Algorithm.AlgorithmType;
+import com.integrado.algorithm.Algorithm.Model;
+import com.integrado.dto.AlgorithmInputDTO;
 import com.integrado.model.Image;
 import com.integrado.util.Constants;
 import com.integrado.util.CsvParser;
@@ -24,8 +26,9 @@ public class CGNR implements Algorithm {
      *
      * @return AlgorithmOutput object.
      */
-    public AlgorithmOutput run(FloatMatrix arrayG, Model model) {
+    public AlgorithmOutput run(FloatMatrix arrayG, AlgorithmInputDTO algorithmInput) {
         LocalDateTime start = LocalDateTime.now();
+        Model model = algorithmInput.getModel();
 
         //define output image length by model
         int outputImageLength = model == Model.one ? 60 : 30;
@@ -61,12 +64,12 @@ public class CGNR implements Algorithm {
             z_anterior = z;
         }
         LocalDateTime finishTime = LocalDateTime.now();
-
-        System.out.println("Time to complete: " + (System.currentTimeMillis() - startTime));
-        return new AlgorithmOutput(f, AlgorithmType.CGNR, outputImageLength, 
+        AlgorithmOutput output = new AlgorithmOutput(f, algorithmInput.getUser(), AlgorithmType.CGNR, outputImageLength, 
                 outputImageLength*outputImageLength, Constants.dateFormatter.format(start), 
                 Constants.timeFormatter.format(start), Constants.timeFormatter.format(LocalDateTime.now()),
                 i, (System.currentTimeMillis() - startTime));
+        Image.generateImageOutput(output, algorithmInput.getUser());
+        return output;
     }
 
 
@@ -77,7 +80,7 @@ public class CGNR implements Algorithm {
         FloatMatrix matrixH = CsvParser.readFloatMatrixFromCsvFile(
                 Constants.MODEL_1_H_MATRIX);
         Algorithm cgnr = new CGNR();
-        AlgorithmOutput output = cgnr.run(arrayG, Model.one);
+        AlgorithmOutput output = cgnr.run(arrayG, null);
         Image.generateImageOutput(output, "cgnr");
     }
 }
