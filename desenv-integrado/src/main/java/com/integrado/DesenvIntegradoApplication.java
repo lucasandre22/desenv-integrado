@@ -22,7 +22,8 @@ public class DesenvIntegradoApplication {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //new Thread(new LoadMonitor(5000)).start();
+        new Thread(new LoadMonitor(100)).start();
+        System.gc();
     }
 
     public static void seeAvailableMemory() {

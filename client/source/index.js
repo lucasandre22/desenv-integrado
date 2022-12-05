@@ -22,7 +22,7 @@ const users = [
         {"user": "P", "algorithm": "CGNE", "model":"two", "file": "../model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": false}
 ]
 
-function getRandomUser(){
+function getRandomUser() {
     const randomIndex = Math.floor(Math.random() * users.length);
     const user = users[randomIndex];
     return user;
@@ -45,9 +45,9 @@ async function getImage() {
     const algorithm = user.algorithm;
     const model = user.model;
 
-    console.log(user.file + " " + userName);
     let arrayG = []
 
+    console.log(user.model);
     fs.createReadStream(user.file)
     .pipe(parse({ delimiter: "," }))
     .on("data", function (row) {
@@ -74,7 +74,7 @@ async function getImage() {
 }
 
 async function getReport(){
-    const url = "http://localhost:5777/" + "report"
+    const url = "http://localhost:5777/reports"
     await fetch(url, {
         method: 'GET',
         headers: {
@@ -84,5 +84,16 @@ async function getReport(){
     .then(text => console.log(text))
 }
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-getImage();
+async function exec() {
+    getReport();
+    getImage();
+    getImage();
+    await sleep(1000);
+    getReport();
+}
+
+exec();

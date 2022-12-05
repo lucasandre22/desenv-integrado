@@ -81,7 +81,7 @@ public class CGNE implements Algorithm {
         AlgorithmInputDTO teste = new AlgorithmInputDTO();
         teste.setArrayG(null);
         teste.setModel(Model.one);
-        teste.setUser("TESTEEE");
+        teste.setUserName("TESTEEE");
         teste.setType(AlgorithmType.CGNR);
         Algorithm cgne = new CGNE();
         AlgorithmOutput output = cgne.run(arrayG, teste);

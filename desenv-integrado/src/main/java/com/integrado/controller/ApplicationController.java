@@ -1,11 +1,12 @@
 package com.integrado.controller;
 
 import java.io.IOException;
+import java.util.PriorityQueue;
 
-import org.jblas.DoubleMatrix;
 import org.jblas.FloatMatrix;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.config.Task;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,16 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.integrado.algorithm.Algorithm;
 import com.integrado.algorithm.Algorithm.AlgorithmType;
-import com.integrado.algorithm.Algorithm.Model;
-import com.integrado.algorithm.AlgorithmMatrixes;
 import com.integrado.algorithm.AlgorithmOutput;
 import com.integrado.algorithm.CGNE;
 import com.integrado.algorithm.CGNR;
 import com.integrado.dto.AlgorithmInputDTO;
-import com.integrado.model.Image;
-import com.integrado.util.Constants;
-import com.integrado.util.CsvParser;
 import com.integrado.util.LoadMonitor;
+import com.integrado.util.Report;
 
 /**
  * 
@@ -36,6 +33,7 @@ public class ApplicationController {
 
     static FloatMatrix arrayGone = null;
     static FloatMatrix arrayGtwo = null;
+    private PriorityQueue<Task> queue;
     /**
      * Get status from server.
      * 
@@ -46,14 +44,9 @@ public class ApplicationController {
         return new ResponseEntity<String>("Server is running :)", HttpStatus.OK);
     }
 
-    @GetMapping("/report")
-    public ResponseEntity<String> getReport() {
-        return new ResponseEntity<String>("Server is running :)", HttpStatus.OK);
-    }
-
-    @GetMapping("/performance")
-    public ResponseEntity<Double> startClient() {
-        return new ResponseEntity<Double>(LoadMonitor.getLoadAverage(), HttpStatus.OK);
+    @GetMapping("/reports")
+    public ResponseEntity<Report> getReport() {
+        return new ResponseEntity<Report>(new Report(LoadMonitor.freeMemory, LoadMonitor.usedMemory, LoadMonitor.getLoadAverage()), HttpStatus.OK);
     }
 
     @PostMapping("/process")
@@ -72,14 +65,6 @@ public class ApplicationController {
         //call garbage collector in order to free some memory
         System.gc();
         return output;
-
-        //matrix length: 189724 ERROR (
-        //../model2/G-2.csv 50816 OK
-        //../model2/g-30x30-2.csv 189724
-        //../model1/G-1.csv 629706 ERROR
-        //../model2/G-2.csv 629706 ERROR
-
-        //matrix length: 27904 OK
     }
 
     public static Algorithm getAlgorithmInstance(AlgorithmType type) {

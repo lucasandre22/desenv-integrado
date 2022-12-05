@@ -6,10 +6,10 @@ import com.sun.management.OperatingSystemMXBean;
 
 public class LoadMonitor implements Runnable {
 
-    //era 1000*1000
     private final static int MB = 1024 * 1024;
-    private static String memoryUsage;
-    private static double cpuLoad = 0;
+    public static long freeMemory = 0;
+    public static double cpuLoad = 0;
+    public static long usedMemory = 0;
     private long timeout;
 
     public LoadMonitor(long timeout) {
@@ -31,18 +31,21 @@ public class LoadMonitor implements Runnable {
                     OperatingSystemMXBean.class);
             double cpuLoad = ManagementFactory.getPlatformMXBean(
                     com.sun.management.OperatingSystemMXBean.class).getCpuLoad();
-            LoadMonitor.cpuLoad = cpuLoad;
-            sleep();
-            System.out.println("Free memory: " + Runtime.getRuntime().freeMemory()/MB);
-            System.out.println("Memory used: "+ (Runtime.getRuntime().totalMemory()-
-                    Runtime.getRuntime().freeMemory())/MB + "Mb");
             long freeMemory = Runtime.getRuntime().freeMemory();
-            System.out.println("Free memory in JVM: " + freeMemory/MB);
             long maxMemory = Runtime.getRuntime().maxMemory();
-            System.out.println("Max memory in JVM: " + maxMemory/MB);
             long totalMemory = Runtime.getRuntime().totalMemory();
-            System.out.println("Total memory in JVM: " + totalMemory/MB);
-            System.out.println("--------------------------------------");
+            LoadMonitor.cpuLoad = cpuLoad;
+            LoadMonitor.freeMemory = freeMemory/MB;
+            LoadMonitor.usedMemory = (Runtime.getRuntime().totalMemory()-
+                    Runtime.getRuntime().freeMemory())/MB;
+            sleep();
+            //System.out.println("Free memory: " + Runtime.getRuntime().freeMemory()/MB);
+            //System.out.println("Memory used: "+ (Runtime.getRuntime().totalMemory()-
+                    //Runtime.getRuntime().freeMemory())/MB + "Mb");
+            //System.out.println("Free memory in JVM: " + freeMemory/MB);
+            //System.out.println("Max memory in JVM: " + maxMemory/MB);
+            //System.out.println("Total memory in JVM: " + totalMemory/MB);
+            //System.out.println("--------------------------------------");
         }
     }
 
