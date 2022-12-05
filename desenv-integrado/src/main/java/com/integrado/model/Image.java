@@ -29,7 +29,7 @@ public class Image {
     public static void saveFloatMatrixToImage(FloatMatrix matrix, int width, int height, String filename) {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
 
-        //Transform the interval of the image
+        //Normalize the image
         final float max = max_element(matrix.data, width*height);
         final float min = min_element(matrix.data, width*height);
         final float den = max - min;

@@ -58,6 +58,7 @@ public class ApplicationController {
     @PostMapping("/process")
     public ResponseEntity<AlgorithmOutput> getArray(@RequestBody AlgorithmInputDTO algorithmInput) throws InterruptedException, IOException {
         AlgorithmOutput output = null;
+        System.out.println(algorithmInput.getArrayG()[0]);
         if(algorithmInput.getModel() == Model.one) {
             output = processModelOne(algorithmInput);
         } else {
