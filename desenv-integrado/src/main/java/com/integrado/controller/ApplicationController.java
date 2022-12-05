@@ -2,6 +2,7 @@ package com.integrado.controller;
 
 import java.io.IOException;
 
+import org.jblas.DoubleMatrix;
 import org.jblas.FloatMatrix;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,42 +57,17 @@ public class ApplicationController {
     }
 
     @PostMapping("/process")
-    public ResponseEntity<AlgorithmOutput> getArray(@RequestBody AlgorithmInputDTO algorithmInput) throws InterruptedException, IOException {
+    public ResponseEntity<AlgorithmOutput> process(@RequestBody AlgorithmInputDTO algorithmInput) throws InterruptedException, IOException {
         AlgorithmOutput output = null;
-        System.out.println(algorithmInput.getArrayG()[0]);
-        if(algorithmInput.getModel() == Model.one) {
-            output = processModelOne(algorithmInput);
-        } else {
-            output = processModelTwo(algorithmInput);
-        }
-
+        output = runAlgorithm(algorithmInput);
         output.setOutputMatrix(null);
         return new ResponseEntity<AlgorithmOutput>(output, HttpStatus.OK);
     }
     
-    public static AlgorithmOutput processModelOne(AlgorithmInputDTO algorithmInput) {
-        try {
-            if(arrayGone == null)
-                arrayGone = FloatMatrix.loadCSVFile(Constants.MODEL_1_G_MATRIX);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static AlgorithmOutput runAlgorithm(AlgorithmInputDTO algorithmInput) {
         Algorithm algorithm = getAlgorithmInstance(algorithmInput.getType());
-        AlgorithmOutput output = algorithm.run(arrayGone, algorithmInput);
-        //call garbage collector in order to free some memory
-        System.gc();
-        return output;
-    }
+        AlgorithmOutput output = algorithm.run(new FloatMatrix(algorithmInput.getArrayG()), algorithmInput);
 
-    public static AlgorithmOutput processModelTwo(AlgorithmInputDTO algorithmInput) {
-        try {
-            if(arrayGtwo == null)
-                arrayGtwo = FloatMatrix.loadCSVFile(Constants.MODEL_2_G_MATRIX_1);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Algorithm algorithm = getAlgorithmInstance(algorithmInput.getType());
-        AlgorithmOutput output = algorithm.run(arrayGtwo, algorithmInput);
         //call garbage collector in order to free some memory
         System.gc();
         return output;

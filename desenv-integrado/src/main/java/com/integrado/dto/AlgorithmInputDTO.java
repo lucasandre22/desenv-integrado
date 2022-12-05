@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class AlgorithmInputDTO {
     private String user;
-    private double[] arrayG;
+    private float[] arrayG;
     private AlgorithmType type;
     private Model model;
 

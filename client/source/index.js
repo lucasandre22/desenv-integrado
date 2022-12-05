@@ -1,5 +1,7 @@
 import fetch from 'node-fetch';
 import * as fs from 'fs';
+import { parse } from 'csv-parse';
+
 
 const users = [
         {"user": "A", "algorithm": "CGNR", "model":"one", "file": "../model1/G-1.csv", "N": 64, "S": 794, "gain": true},
@@ -43,29 +45,38 @@ async function getImage() {
     const algorithm = user.algorithm;
     const model = user.model;
 
+    console.log(user.file);
     let arrayG = []
-    fs.readFile(getRandomUser().file, 'utf8', (err, dat) => {
-        if(err){
-            console.error("Error while opening file");
-        } else {
-            arrayG = String(dat).split('\r\n');
-        }
-    });
 
-    if(user.gain){
-        signalGain(arrayG, user.N, user.S);
-    }
-
-    await fetch(url, {
-        method: 'POST',
-        headers:  {'Content-Type': 'application/json'},
-        json: true,
-        body: JSON.stringify({userName, arrayG, algorithm, model})
+    fs.createReadStream(user.file)
+    .pipe(parse({ delimiter: ",", from_line: 2 }))
+    .on("data", function (row) {
+        arrayG.push(row[0]);
+        console.log(row.length);
     })
-    .then(response => response.json())
-    .then(jsonResponse => {
-      console.log(jsonResponse);
+    .on("end", async function () {
+        if(user.gain){
+            signalGain(arrayG, user.N, user.S);
+        }
+    
+        console.log({userName, arrayG, algorithm, model});
+    
+        await fetch(url, {
+            method: 'POST',
+            headers:  {'Content-Type': 'application/json'},
+            json: true,
+            body: JSON.stringify({userName, arrayG, algorithm, model})
+        })
+        .then(response => response.json())
+        .then(jsonResponse => {
+          console.log(jsonResponse);
+        });
+    })
+    .on("error", function (error) {
+        console.log(error.message);
     });
+    console.log("lala");
+
 }
 
 async function getReport(){
