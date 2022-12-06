@@ -70,7 +70,9 @@ public class CGNR implements Algorithm {
                 i, (System.currentTimeMillis() - startTime));
 
         String imageFilename = output.setAndGetImageName(algorithmInput.getUserName());
-        Image.generateImageOutput(f, outputImageLength, imageFilename);
+        if(algorithmInput.isSaveFile()) {
+            Image.generateImageOutput(f, outputImageLength, imageFilename);
+        }
         return output;
     }
 

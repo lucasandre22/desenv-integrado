@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.integrado.algorithm.Algorithm;
 import com.integrado.algorithm.Algorithm.AlgorithmType;
+import com.integrado.algorithm.Algorithm.Model;
 import com.integrado.algorithm.AlgorithmOutput;
 import com.integrado.algorithm.CGNE;
 import com.integrado.algorithm.CGNR;
@@ -52,6 +53,8 @@ public class ApplicationController {
     @PostMapping("/process")
     public ResponseEntity<AlgorithmOutput> process(@RequestBody AlgorithmInputDTO algorithmInput) throws InterruptedException, IOException {
         AlgorithmOutput output = runAlgorithm(algorithmInput);
+        //call garbage collector in order to free some memory
+        System.gc();
         return new ResponseEntity<AlgorithmOutput>(output, HttpStatus.OK);
     }
     
@@ -62,13 +65,20 @@ public class ApplicationController {
         System.out.println("LENGTH array: " + algorithmInput.getArrayG().length);
         AlgorithmOutput output = algorithm.run(arrayG, algorithmInput);
 
-        //call garbage collector in order to free some memory
-        System.gc();
         return output;
     }
 
     public static Algorithm getAlgorithmInstance(AlgorithmType type) {
         return type == AlgorithmType.CGNE ? new CGNE() : new CGNR();
+    }
+
+    public static void waitForMemory() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }
 //o algoritmo tem q ser capaz de se adaptar

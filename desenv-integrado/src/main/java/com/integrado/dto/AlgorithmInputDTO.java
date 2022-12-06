@@ -12,5 +12,6 @@ public class AlgorithmInputDTO {
     private float[] arrayG;
     private AlgorithmType type;
     private Model model;
+    private boolean saveFile = true;
 
 }

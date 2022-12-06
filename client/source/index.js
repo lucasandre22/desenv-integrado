@@ -8,14 +8,14 @@ const users = [
         {"user": "B", "algorithm": "CGNR", "model":"one", "file": "../model1/G-1.csv", "N": 64, "S": 794, "gain": false},
         {"user": "C", "algorithm": "CGNR", "model":"one", "file": "../model2/G-2.csv", "N": 64, "S": 794, "gain": true},
         {"user": "D", "algorithm": "CGNR", "model":"one", "file": "../model2/G-2.csv", "N": 64, "S": 794, "gain": false},
-        {"user": "E", "algorithm": "CGNR", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": true},
-        {"user": "F", "algorithm": "CGNR", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": false},
-        {"user": "G", "algorithm": "CGNR", "model":"two", "file": "../model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": true},
-        {"user": "H", "algorithm": "CGNR", "model":"two", "file": "../model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": false},
         {"user": "I", "algorithm": "CGNE", "model":"one", "file": "../model1/G-1.csv", "N": 64, "S": 794, "gain": true},
         {"user": "J", "algorithm": "CGNE", "model":"one", "file": "../model1/G-1.csv", "N": 64, "S": 794, "gain": false},
         {"user": "K", "algorithm": "CGNE", "model":"one", "file": "../model2/G-2.csv", "N": 64, "S": 794, "gain": true},
         {"user": "L", "algorithm": "CGNE", "model":"one", "file": "../model2/G-2.csv", "N": 64, "S": 794, "gain": false},
+        {"user": "E", "algorithm": "CGNR", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": true},
+        {"user": "F", "algorithm": "CGNR", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": false},
+        {"user": "G", "algorithm": "CGNR", "model":"two", "file": "../model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": true},
+        {"user": "H", "algorithm": "CGNR", "model":"two", "file": "../model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": false},
         {"user": "M", "algorithm": "CGNE", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": true},
         {"user": "N", "algorithm": "CGNE", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": false},
         {"user": "O", "algorithm": "CGNE", "model":"two", "file": "../model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": true},
@@ -24,6 +24,18 @@ const users = [
 
 function getRandomUser() {
     const randomIndex = Math.floor(Math.random() * users.length);
+    const user = users[randomIndex];
+    return user;
+}
+
+function getRandomModelOneUser() {
+    const randomIndex = Math.floor(Math.random() * 8);
+    const user = users[randomIndex];
+    return user;
+}
+
+function getRandomModelTwoUser() {
+    const randomIndex = Math.floor((Math.random() * 8) + 8);
     const user = users[randomIndex];
     return user;
 }
@@ -38,9 +50,16 @@ function signalGain(arrayG, N, S) {
     }
 }
 
-async function getImage() {
+async function getImage(imageModel) {
     const url = "http://localhost:5777/process"
-    const user = getRandomUser();
+    let user;
+    if(imageModel == "one") {
+        user = getRandomModelOneUser();
+    } else if(imageModel == "two") {
+        user = getRandomModelTwoUser();
+    } else {
+        user = getRandomUser();
+    }
     const userName = user.user;
     const algorithm = user.algorithm;
     const model = user.model;
@@ -48,6 +67,8 @@ async function getImage() {
     let arrayG = []
 
     console.log(user.model);
+    let saveFile = false;
+
     fs.createReadStream(user.file)
     .pipe(parse({ delimiter: "," }))
     .on("data", function (row) {
@@ -61,7 +82,7 @@ async function getImage() {
             method: 'POST',
             headers:  {'Content-Type': 'application/json'},
             json: true,
-            body: JSON.stringify({userName, arrayG, algorithm, model})
+            body: JSON.stringify({userName, arrayG, algorithm, model, saveFile})
         })
         .then(response => response.json())
         .then(jsonResponse => {
@@ -73,27 +94,35 @@ async function getImage() {
     });
 }
 
-async function getReport(){
+async function getReport() {
     const url = "http://localhost:5777/reports"
+    let output;
     await fetch(url, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
         },
     }).then(response => response.text())
-    .then(text => console.log(text))
+    .then(jsonResponse => {output = jsonResponse});
+    return output;
 }
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function exec() {
-    getReport();
-    getImage();
-    getImage();
-    await sleep(1000);
-    getReport();
+async function stress() {
+    while(true) {
+        let freeMemoryMb = await getReport();
+        freeMemoryMb = Number(freeMemoryMb.split(':')[1].split(',')[0]);
+        console.log(freeMemoryMb);
+        if(freeMemoryMb > 900) {
+            getImage("one");
+        } else if(freeMemoryMb > 230) {
+            getImage("two");
+        }
+        await sleep(100);
+    }
 }
 
-exec();
+stress();
