@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import org.jblas.FloatMatrix;
 
 import com.integrado.algorithm.Algorithm.AlgorithmType;
+import com.integrado.algorithm.Algorithm.Model;
 import com.integrado.dto.AlgorithmInputDTO;
 import com.integrado.model.Image;
 import com.integrado.util.Constants;
@@ -29,7 +30,8 @@ public class CGNE implements Algorithm {
      * 
      * @return AlgorithmOutput object.
      */
-    public AlgorithmOutput run(FloatMatrix arrayG, AlgorithmInputDTO algorithmInput) {
+    @Override
+    public AlgorithmOutput run(FloatMatrix arrayG, AlgorithmInputDTO algorithmInput) throws OutOfMemoryError {
         LocalDateTime start = LocalDateTime.now();
         Model model = algorithmInput.getModel();
 
@@ -37,7 +39,13 @@ public class CGNE implements Algorithm {
         int outputImageLength = model == Model.one ? 60 : 30;
         FloatMatrix f = FloatMatrix.zeros(1, outputImageLength*outputImageLength);
         FloatMatrix r = arrayG;
-        FloatMatrix p = AlgorithmMatrixes.getMatrixH(model).transpose().mmul(r);
+        FloatMatrix transpose = AlgorithmMatrixes.getMatrixH(model).transpose();
+        FloatMatrix p = transpose.mmul(r);
+        /*if(algorithmInput.getModel() == Model.one)
+            LoadMonitor.isAboutToProcessModelOne.set(false);
+        else
+            LoadMonitor.isAboutToProcessModelTwo.set(false);*/
+        LoadMonitor.increaseMemoryAvailable(algorithmInput.getModel());
         FloatMatrix r_next;
 
         int i = 1;
@@ -53,16 +61,22 @@ public class CGNE implements Algorithm {
             r_next = r.sub(AlgorithmMatrixes.getMatrixH(model).mmul(alpha).mmul(p));
 
             if(verifyError(r, r_next)) {
-                System.out.println("Error achieved!");
+                //System.out.println("Error achieved!");
                 break;
             }
 
             new_r_dot = r_next.dot(r_next);
             beta = new_r_dot/r_dot;
             r_dot = new_r_dot;
-            p = AlgorithmMatrixes.getMatrixH(model).transpose().mmul(r_next).add(p.mmul(beta));
+            p = transpose.mmul(r_next).add(p.mmul(beta));
             r = r_next;
         }
+        r_next = null;
+        r = null;
+        p = null;
+        arrayG = null;
+        //call garbage collector in order to free some memory
+        System.gc();
 
         AlgorithmOutput output = new AlgorithmOutput("", AlgorithmType.CGNR, outputImageLength, 
                 outputImageLength*outputImageLength, Constants.dateFormatter.format(start), 
@@ -77,7 +91,7 @@ public class CGNE implements Algorithm {
     }
 
     public static void main(String[] args) {
-        new Thread(new LoadMonitor(1000)).start();
+        //new Thread(new LoadMonitor(1000)).start();
         FloatMatrix arrayG = CsvParser.readFloatMatrixFromCsvFile(Constants.MODEL_1_G_MATRIX);
         //FloatMatrix matrixH = CsvParser.readFloatMatrixFromCsvFile(Constants.MODEL_1_H_MATRIX);
         AlgorithmInputDTO teste = new AlgorithmInputDTO();

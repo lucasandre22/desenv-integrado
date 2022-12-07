@@ -1,6 +1,7 @@
 package com.integrado.algorithm;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jblas.FloatMatrix;
 
@@ -26,7 +27,7 @@ public class CGNR implements Algorithm {
      *
      * @return AlgorithmOutput object.
      */
-    public AlgorithmOutput run(FloatMatrix arrayG, AlgorithmInputDTO algorithmInput) {
+    public AlgorithmOutput run(FloatMatrix arrayG, AlgorithmInputDTO algorithmInput) throws OutOfMemoryError {
         LocalDateTime start = LocalDateTime.now();
         Model model = algorithmInput.getModel();
 
@@ -34,11 +35,17 @@ public class CGNR implements Algorithm {
         int outputImageLength = model == Model.one ? 60 : 30;
         FloatMatrix f = FloatMatrix.zeros(1, outputImageLength*outputImageLength);
         FloatMatrix r = arrayG;
-        FloatMatrix z = AlgorithmMatrixes.getMatrixH(model).transpose().mmul(r);
+        FloatMatrix transpose = AlgorithmMatrixes.getMatrixH(model).transpose();
+        FloatMatrix z = transpose.mmul(r);
+        /*if(algorithmInput.getModel() == Model.one)
+            LoadMonitor.isAboutToProcessModelOne.set(false);
+        else
+            LoadMonitor.isAboutToProcessModelTwo.set(false);*/
         FloatMatrix p = z;
 
         FloatMatrix r_next;
         FloatMatrix z_anterior = z;
+        LoadMonitor.increaseMemoryAvailable(algorithmInput.getModel());
 
         long startTime = System.currentTimeMillis();
         int i = 1;
@@ -55,7 +62,7 @@ public class CGNR implements Algorithm {
                 break;
             }
 
-            z = AlgorithmMatrixes.getMatrixTranspose(model).mmul(r_next);
+            z = transpose.mmul(r_next);
 
             float beta = (z.norm2() * z.norm2()) / (z_anterior.norm2() * z_anterior.norm2());
             p = z.add(p.mul(beta));
@@ -63,6 +70,15 @@ public class CGNR implements Algorithm {
             r = r_next;
             z_anterior = z;
         }
+        z = null;
+        r_next = null;
+        z_anterior = null;
+        r = null;
+        p = null;
+        arrayG = null;
+        transpose = null;
+        //call garbage collector in order to free some memory
+        System.gc();
 
         AlgorithmOutput output = new AlgorithmOutput("", AlgorithmType.CGNR, outputImageLength, 
                 outputImageLength*outputImageLength, Constants.dateFormatter.format(start), 
@@ -78,7 +94,7 @@ public class CGNR implements Algorithm {
 
 
     public static void main(String[] args) {
-        new Thread(new LoadMonitor(1000)).start();
+        //new Thread(new LoadMonitor(1000)).start();
         FloatMatrix arrayG = CsvParser.readFloatMatrixFromCsvFile(
                 Constants.MODEL_1_G_MATRIX);
         FloatMatrix matrixH = CsvParser.readFloatMatrixFromCsvFile(

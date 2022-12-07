@@ -7,6 +7,7 @@ import org.jblas.FloatMatrix;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.config.Task;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,7 +35,7 @@ public class ApplicationController {
 
     static FloatMatrix arrayGone = null;
     static FloatMatrix arrayGtwo = null;
-    private PriorityQueue<Task> queue;
+    //private PriorityQueue<Task> queue;
     /**
      * Get status from server.
      * 
@@ -47,47 +48,68 @@ public class ApplicationController {
 
     @GetMapping("/reports")
     public ResponseEntity<Report> getReport() {
+        LoadMonitor.run();
         return new ResponseEntity<Report>(new Report(LoadMonitor.freeMemory, LoadMonitor.usedMemory, LoadMonitor.getLoadAverage()), HttpStatus.OK);
     }
 
     @PostMapping("/process")
     public ResponseEntity<AlgorithmOutput> process(@RequestBody AlgorithmInputDTO algorithmInput) throws InterruptedException, IOException {
+        if(!LoadMonitor.hasEnoughMemory(algorithmInput.getModel())) {
+            waitForMemory(algorithmInput.getModel());
+        }
+        LoadMonitor.lowerMemoryAvailable(algorithmInput.getModel());
+        /*if(algorithmInput.getModel() == Model.one)
+            LoadMonitor.isAboutToProcessModelOne.set(true);
+        else
+            LoadMonitor.isAboutToProcessModelTwo.set(true);*/
+        System.out.println("Processing " + algorithmInput.getModel());
         AlgorithmOutput output = runAlgorithm(algorithmInput);
-        //call garbage collector in order to free some memory
-        System.gc();
         return new ResponseEntity<AlgorithmOutput>(output, HttpStatus.OK);
     }
     
     public static AlgorithmOutput runAlgorithm(AlgorithmInputDTO algorithmInput) {
         Algorithm algorithm = getAlgorithmInstance(algorithmInput.getType());
         FloatMatrix arrayG = new FloatMatrix(algorithmInput.getArrayG());
-        System.out.println("LENGTH: " + arrayG.length);
-        System.out.println("LENGTH array: " + algorithmInput.getArrayG().length);
-        AlgorithmOutput output = algorithm.run(arrayG, algorithmInput);
+        AlgorithmOutput output = null;
+        //if heap exception occurs inside the algorithm
+        try {
+            output = algorithm.run(arrayG, algorithmInput);
+        } catch(Exception e) {
+            LoadMonitor.increaseMemoryAvailable(algorithmInput.getModel());
+            if(algorithmInput.getModel() == Model.one) 
+                LoadMonitor.isAboutToProcessModelOne.set(false);
+            else
+                LoadMonitor.isAboutToProcessModelTwo.set(false);
+            System.gc();
+            throw e;
+        }
 
         return output;
     }
+
+    /*@ExceptionHandler(OutOfMemoryError.class)
+    public static ResponseEntity<String> handleOutOfMemory(OutOfMemoryError e) {
+            LoadMonitor.isAboutToProcessModelOne.set(false);
+            LoadMonitor.isAboutToProcessModelTwo.set(false);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
+    }*/
 
     public static Algorithm getAlgorithmInstance(AlgorithmType type) {
         return type == AlgorithmType.CGNE ? new CGNE() : new CGNR();
     }
 
-    public static void waitForMemory() {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+    public static void waitForMemory(Model model) {
+        int i = 1;
+        //implement priority queue
+        while(!LoadMonitor.hasEnoughMemory(model)) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("Waiting for memory... " + i++);
         }
     }
 }
-//o algoritmo tem q ser capaz de se adaptar
-//trabalhar com limiares
-
-//ver se o pc tem memoria suficiente para carregar as duas matrizes, se nao, 
-//carrega dinamicamente
-
-//tentar compactar matriz na memoria?
-//tem muitos zeros na matriz, pesquisar matriz esparsa, pesquisar EJML;
-
-//implementar rajada

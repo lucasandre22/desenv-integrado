@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import * as fs from 'fs';
 import { parse } from 'csv-parse';
+import { exit } from 'process';
 
 
 const users = [
@@ -41,10 +42,11 @@ function getRandomModelTwoUser() {
 }
 
 function signalGain(arrayG, N, S) {
+    console.log("Gain!");
     for(let i = 0; i < N; i++) {
         for(let j = 0; j < S; j++) {
             let gain = 100 + (1/20) * j * Math.sqrt(j);
-            let index = i + (j*S);
+            let index = j + (i*S);
             arrayG[index] = arrayG[index] * gain;
         }
     }
@@ -75,8 +77,8 @@ async function getImage(imageModel) {
         arrayG.push(row[0]);
     })
     .on("end", async function () {
-        if(user.gain){
-            //signalGain(arrayG, user.N, user.S); TODO error
+        if(user.gain) {
+            signalGain(arrayG, user.N, user.S);
         }
         await fetch(url, {
             method: 'POST',
@@ -86,11 +88,17 @@ async function getImage(imageModel) {
         })
         .then(response => response.json())
         .then(jsonResponse => {
-          console.log(jsonResponse);
+            console.log("response");
+            //Java heap space exception (it should not occur)
+            if(jsonResponse.status == 500) {
+                console.log(jsonResponse);
+                exit(1);
+            }
         });
     })
     .on("error", function (error) {
         console.log(error.message);
+        exit(1);
     });
 }
 
@@ -111,17 +119,22 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+const memoryToProcessModelOne = 900;
+const memoryToProcessModelTwo = 180;
+
 async function stress() {
+    let i = 0;
     while(true) {
         let freeMemoryMb = await getReport();
         freeMemoryMb = Number(freeMemoryMb.split(':')[1].split(',')[0]);
-        console.log(freeMemoryMb);
-        if(freeMemoryMb > 900) {
+        console.log("Available memory:" + freeMemoryMb);
+
+        if(freeMemoryMb > memoryToProcessModelOne) {
             getImage("one");
-        } else if(freeMemoryMb > 230) {
+        } else if(freeMemoryMb > memoryToProcessModelTwo) {
             getImage("two");
         }
-        await sleep(100);
+        await sleep(250);
     }
 }
 
