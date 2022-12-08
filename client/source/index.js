@@ -119,8 +119,8 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-const memoryToProcessModelOne = 900;
-const memoryToProcessModelTwo = 180;
+const memoryToProcessModelOne = 950;
+const memoryToProcessModelTwo = 200;
 
 async function stress() {
     let i = 0;
@@ -133,8 +133,9 @@ async function stress() {
             getImage("one");
         } else if(freeMemoryMb > memoryToProcessModelTwo) {
             getImage("two");
+        } else {
+            await sleep(250);
         }
-        await sleep(250);
     }
 }
 

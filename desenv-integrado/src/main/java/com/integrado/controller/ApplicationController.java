@@ -58,10 +58,6 @@ public class ApplicationController {
             waitForMemory(algorithmInput.getModel());
         }
         LoadMonitor.lowerMemoryAvailable(algorithmInput.getModel());
-        /*if(algorithmInput.getModel() == Model.one)
-            LoadMonitor.isAboutToProcessModelOne.set(true);
-        else
-            LoadMonitor.isAboutToProcessModelTwo.set(true);*/
         System.out.println("Processing " + algorithmInput.getModel());
         AlgorithmOutput output = runAlgorithm(algorithmInput);
         return new ResponseEntity<AlgorithmOutput>(output, HttpStatus.OK);

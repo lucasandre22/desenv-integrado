@@ -1,28 +1,16 @@
 package com.integrado.algorithm;
 
-import java.io.IOException;
-
 import org.jblas.FloatMatrix;
 
 import com.integrado.algorithm.Algorithm.Model;
-import com.integrado.util.Constants;
-import com.integrado.util.CsvParser;
 
 public class AlgorithmMatrixes {
-    //load dinamically
 
-    //maybe do a queue, you can differentiate the models and process models that are equal
-    //concurrently?
+    public static FloatMatrix arrayGone = null;
+    public static FloatMatrix matrixHone = null;
 
-    public static FloatMatrix arrayGone = null;/*CsvParser.readFloatMatrixFromCsvFile(
-            Constants.MODEL_1_G_MATRIX);*/
-    public static FloatMatrix matrixHone = null; /*CsvParser.readFloatMatrixFromCsvFile(
-            Constants.MODEL_1_H_MATRIX);*/
-
-    public static final FloatMatrix arrayGtwo = null;/*CsvParser.readFloatMatrixFromCsvFile(
-            Constants.MODEL_2_G_MATRIX_1);*/
-    public static FloatMatrix matrixHtwo = null;/* CsvParser.readFloatMatrixFromCsvFile(
-            Constants.MODEL_2_H_MATRIX);*/
+    public static final FloatMatrix arrayGtwo = null;
+    public static FloatMatrix matrixHtwo = null;
 
     static {
         /*try {
@@ -31,17 +19,6 @@ public class AlgorithmMatrixes {
             e.printStackTrace();
         }*/
     }
-
-    /*public static FloatMatrix getMatrixTranspose(Model model) {
-        if(model.equals(Model.one)) {
-            if(matrixHfirstTranspose == null)
-                matrixHfirstTranspose = matrixHone.transpose();
-            return matrixHfirstTranspose;
-        }
-        if(matrixHsecondTranspose == null)
-            matrixHsecondTranspose = matrixHtwo.transpose();
-        return matrixHsecondTranspose;
-    }*/
 
     public static FloatMatrix getMatrixTranspose(Model model) {
         if(model.equals(Model.one)) {
