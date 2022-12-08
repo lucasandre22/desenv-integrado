@@ -54,9 +54,11 @@ public class ApplicationController {
 
     @PostMapping("/process")
     public ResponseEntity<AlgorithmOutput> process(@RequestBody AlgorithmInputDTO algorithmInput) throws InterruptedException, IOException {
+
         if(!LoadMonitor.hasEnoughMemory(algorithmInput.getModel())) {
             waitForMemory(algorithmInput.getModel());
         }
+
         LoadMonitor.lowerMemoryAvailable(algorithmInput.getModel());
         System.out.println("Processing " + algorithmInput.getModel());
         AlgorithmOutput output = runAlgorithm(algorithmInput);

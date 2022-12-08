@@ -41,10 +41,6 @@ public class CGNE implements Algorithm {
         FloatMatrix r = arrayG;
         FloatMatrix transpose = AlgorithmMatrixes.getMatrixH(model).transpose();
         FloatMatrix p = transpose.mmul(r);
-        /*if(algorithmInput.getModel() == Model.one)
-            LoadMonitor.isAboutToProcessModelOne.set(false);
-        else
-            LoadMonitor.isAboutToProcessModelTwo.set(false);*/
         LoadMonitor.increaseMemoryAvailable(algorithmInput.getModel());
         FloatMatrix r_next;
 

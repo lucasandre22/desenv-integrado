@@ -66,18 +66,18 @@ public class LoadMonitor {
     }
 
     public static void lowerMemoryAvailable(Model model) {
-        toLower += model == Model.one ? 900 : 150;
+        toLower += model == Model.one ? 900 : 200;
     }
 
     public static void increaseMemoryAvailable(Model model) {
-        toLower -= model == Model.one ? 900 : 150;
+        toLower -= model == Model.one ? 900 : 200;
     }
 
     public static boolean hasEnoughMemory(Model model) {
         run();
         if(model == Model.one) {
-            return LoadMonitor.freeMemory > 850 ? true : false;
+            return LoadMonitor.freeMemory > 950 ? true : false;
         }
-        return LoadMonitor.freeMemory > 140 ? true : false;
+        return LoadMonitor.freeMemory > 200 ? true : false;
     }
 }

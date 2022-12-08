@@ -37,10 +37,6 @@ public class CGNR implements Algorithm {
         FloatMatrix r = arrayG;
         FloatMatrix transpose = AlgorithmMatrixes.getMatrixH(model).transpose();
         FloatMatrix z = transpose.mmul(r);
-        /*if(algorithmInput.getModel() == Model.one)
-            LoadMonitor.isAboutToProcessModelOne.set(false);
-        else
-            LoadMonitor.isAboutToProcessModelTwo.set(false);*/
         FloatMatrix p = z;
 
         FloatMatrix r_next;

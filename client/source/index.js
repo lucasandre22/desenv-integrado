@@ -69,7 +69,7 @@ async function getImage(imageModel) {
     let arrayG = []
 
     console.log(user.model);
-    let saveFile = false;
+    let saveFile = true;
 
     fs.createReadStream(user.file)
     .pipe(parse({ delimiter: "," }))
@@ -88,7 +88,8 @@ async function getImage(imageModel) {
         })
         .then(response => response.json())
         .then(jsonResponse => {
-            console.log("response");
+            console.log(jsonResponse);
+            writeImageReportToFile(jsonResponse);
             //Java heap space exception (it should not occur)
             if(jsonResponse.status == 500) {
                 console.log(jsonResponse);
@@ -110,7 +111,7 @@ async function getReport() {
         headers: {
             'Accept': 'application/json',
         },
-    }).then(response => response.text())
+    }).then(response => response.json())
     .then(jsonResponse => {output = jsonResponse});
     return output;
 }
@@ -119,24 +120,63 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+async function writeImageReportToFile(output) {
+    let line;
+
+    for (const key in output) {
+        line += `${key} : ${output[key]} \n`;
+    }
+    line += '\n';
+    console.log(line);
+
+    fs.appendFile("./relatorioImagens.txt", line, function(err) {
+        if(err) {
+            return console.log(err);
+        }
+    });
+}
+
+async function writeReportToFile(output) {
+    let line;
+
+    for (const key in output) {
+        line += `${key} : ${output[key]} \n`;
+    }
+    line += '\n';
+
+    fs.appendFile("./relatorio.txt", line, function(err) {
+        if(err) {
+            return console.log(err);
+        }
+    });
+}
+
+async function getReportPeriodically() {
+    while(true) {
+        let output = await getReport();
+        writeReportToFile(output);
+        await sleep(5000);
+    }
+}
+
 const memoryToProcessModelOne = 950;
 const memoryToProcessModelTwo = 200;
 
 async function stress() {
     let i = 0;
     while(true) {
-        let freeMemoryMb = await getReport();
-        freeMemoryMb = Number(freeMemoryMb.split(':')[1].split(',')[0]);
-        console.log("Available memory:" + freeMemoryMb);
+        let output = await getReport();
+        let freeMemoryMb = output.freeMemoryMb;
+        console.log("Available memory:" + output.freeMemoryMb);
 
         if(freeMemoryMb > memoryToProcessModelOne) {
             getImage("one");
         } else if(freeMemoryMb > memoryToProcessModelTwo) {
             getImage("two");
-        } else {
-            await sleep(250);
         }
+        await sleep(300);
     }
 }
 
+getReportPeriodically();
 stress();
