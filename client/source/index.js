@@ -30,14 +30,14 @@ const modelTwoUsers = [
 function getRandomModelOneUser() {
     const randomIndex = Math.floor(Math.random() * modelOneUsers.length);
     console.log(randomIndex);
-    const user = modelOneUsers[4];
+    const user = modelOneUsers[randomIndex];
     return user;
 }
 
 function getRandomModelTwoUser() {
     const randomIndex = Math.floor(Math.random() * modelTwoUsers.length);
     console.log(randomIndex);
-    const user = modelTwoUsers[4];
+    const user = modelTwoUsers[randomIndex];
     return user;
 }
 
@@ -175,9 +175,9 @@ async function stress() {
         await sleep(300);
     }
 }
-getImage("one");
+//getImage("one");
 //getReportPeriodically();
-//stress();
+stress();
 
 function generateImagesReport() {
     // init document

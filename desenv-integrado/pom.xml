@@ -68,7 +68,7 @@
 				<configuration>
                     <executable>true</executable>
                     <jvmArguments>
-                        -Xmx2g
+                        -Xmx3g
                     </jvmArguments>
                 </configuration>
 			</plugin>
