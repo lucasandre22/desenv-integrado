@@ -39,7 +39,7 @@ public class Image {
             }
         }
 
-        File file = new File("./images/" + filename + ".bmp");
+        File file = new File("./" + filename);
         try {
             ImageIO.write(image, "bmp", file);
         } catch (IOException e) {

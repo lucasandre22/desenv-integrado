@@ -16,7 +16,7 @@ public class AlgorithmOutput {
     private String startTime;
     private String endTime;
     private int totalIterations;
-    private long timeToComplete;
+    private String timeToComplete;
 
     //cpu usage
     //memory usage

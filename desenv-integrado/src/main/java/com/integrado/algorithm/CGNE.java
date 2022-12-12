@@ -1,15 +1,9 @@
 package com.integrado.algorithm;
 
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import org.jblas.FloatMatrix;
 
-import com.integrado.algorithm.Algorithm.AlgorithmType;
-import com.integrado.algorithm.Algorithm.Model;
 import com.integrado.dto.AlgorithmInputDTO;
 import com.integrado.model.Image;
 import com.integrado.util.Constants;
@@ -77,7 +71,7 @@ public class CGNE implements Algorithm {
         AlgorithmOutput output = new AlgorithmOutput("", AlgorithmType.CGNR, outputImageLength, 
                 outputImageLength*outputImageLength, Constants.dateFormatter.format(start), 
                 Constants.timeFormatter.format(start), Constants.timeFormatter.format(LocalDateTime.now()),
-                i, (System.currentTimeMillis() - startTime));
+                i, (System.currentTimeMillis() - startTime) + "ms");
 
         String imageFilename = output.setAndGetImageName(algorithmInput.getUserName());
         if(algorithmInput.isSaveFile()) {

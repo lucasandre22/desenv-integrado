@@ -2,42 +2,42 @@ import fetch from 'node-fetch';
 import * as fs from 'fs';
 import { parse } from 'csv-parse';
 import { exit } from 'process';
+import PDFDocument from 'pdfkit-table';
 
+var reportOutputs = [];
 
-const users = [
-        {"user": "A", "algorithm": "CGNR", "model":"one", "file": "../model1/G-1.csv", "N": 64, "S": 794, "gain": true},
-        {"user": "B", "algorithm": "CGNR", "model":"one", "file": "../model1/G-1.csv", "N": 64, "S": 794, "gain": false},
-        {"user": "C", "algorithm": "CGNR", "model":"one", "file": "../model2/G-2.csv", "N": 64, "S": 794, "gain": true},
-        {"user": "D", "algorithm": "CGNR", "model":"one", "file": "../model2/G-2.csv", "N": 64, "S": 794, "gain": false},
-        {"user": "I", "algorithm": "CGNE", "model":"one", "file": "../model1/G-1.csv", "N": 64, "S": 794, "gain": true},
-        {"user": "J", "algorithm": "CGNE", "model":"one", "file": "../model1/G-1.csv", "N": 64, "S": 794, "gain": false},
-        {"user": "K", "algorithm": "CGNE", "model":"one", "file": "../model2/G-2.csv", "N": 64, "S": 794, "gain": true},
-        {"user": "L", "algorithm": "CGNE", "model":"one", "file": "../model2/G-2.csv", "N": 64, "S": 794, "gain": false},
-        {"user": "E", "algorithm": "CGNR", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": true},
-        {"user": "F", "algorithm": "CGNR", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": false},
-        {"user": "G", "algorithm": "CGNR", "model":"two", "file": "../model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": true},
-        {"user": "H", "algorithm": "CGNR", "model":"two", "file": "../model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": false},
-        {"user": "M", "algorithm": "CGNE", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": true},
-        {"user": "N", "algorithm": "CGNE", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": false},
-        {"user": "O", "algorithm": "CGNE", "model":"two", "file": "../model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": true},
-        {"user": "P", "algorithm": "CGNE", "model":"two", "file": "../model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": false}
-]
-
-function getRandomUser() {
-    const randomIndex = Math.floor(Math.random() * users.length);
-    const user = users[randomIndex];
-    return user;
-}
+const modelOneUsers = [
+        {"user": "A", "type": "CGNR", "model":"one", "file": "../model1/G-1.csv", "N": 64, "S": 794, "gain": true},
+        {"user": "B", "type": "CGNR", "model":"one", "file": "../model1/G-1.csv", "N": 64, "S": 794, "gain": false},
+        {"user": "C", "type": "CGNR", "model":"one", "file": "../model2/G-2.csv", "N": 64, "S": 794, "gain": true},
+        {"user": "D", "type": "CGNR", "model":"one", "file": "../model2/G-2.csv", "N": 64, "S": 794, "gain": false},
+        {"user": "I", "type": "CGNE", "model":"one", "file": "../model1/G-1.csv", "N": 64, "S": 794, "gain": true},
+        {"user": "J", "type": "CGNE", "model":"one", "file": "../model1/G-1.csv", "N": 64, "S": 794, "gain": false},
+        {"user": "K", "type": "CGNE", "model":"one", "file": "../model2/G-2.csv", "N": 64, "S": 794, "gain": true},
+        {"user": "L", "type": "CGNE", "model":"one", "file": "../model2/G-2.csv", "N": 64, "S": 794, "gain": false}
+];
+const modelTwoUsers = [
+    {"user": "E", "type": "CGNR", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": true},
+    {"user": "F", "type": "CGNR", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": false},
+    {"user": "G", "type": "CGNR", "model":"two", "file": "../model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": true},
+    {"user": "H", "type": "CGNR", "model":"two", "file": "../model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": false},
+    {"user": "M", "type": "CGNE", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": true},
+    {"user": "N", "type": "CGNE", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": false},
+    {"user": "O", "type": "CGNE", "model":"two", "file": "../model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": true},
+    {"user": "P", "type": "CGNE", "model":"two", "file": "../model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": false}
+];
 
 function getRandomModelOneUser() {
-    const randomIndex = Math.floor(Math.random() * 8);
-    const user = users[randomIndex];
+    const randomIndex = Math.floor(Math.random() * modelOneUsers.length);
+    console.log(randomIndex);
+    const user = modelOneUsers[4];
     return user;
 }
 
 function getRandomModelTwoUser() {
-    const randomIndex = Math.floor((Math.random() * 8) + 8);
-    const user = users[randomIndex];
+    const randomIndex = Math.floor(Math.random() * modelTwoUsers.length);
+    console.log(randomIndex);
+    const user = modelTwoUsers[4];
     return user;
 }
 
@@ -57,18 +57,16 @@ async function getImage(imageModel) {
     let user;
     if(imageModel == "one") {
         user = getRandomModelOneUser();
-    } else if(imageModel == "two") {
-        user = getRandomModelTwoUser();
     } else {
-        user = getRandomUser();
+        user = getRandomModelTwoUser();
     }
     const userName = user.user;
-    const algorithm = user.algorithm;
+    const type = user.type;
     const model = user.model;
 
     let arrayG = []
 
-    console.log(user.model);
+    console.log(type);
     let saveFile = true;
 
     fs.createReadStream(user.file)
@@ -84,12 +82,11 @@ async function getImage(imageModel) {
             method: 'POST',
             headers:  {'Content-Type': 'application/json'},
             json: true,
-            body: JSON.stringify({userName, arrayG, algorithm, model, saveFile})
+            body: JSON.stringify({userName, arrayG, type, model, saveFile})
         })
         .then(response => response.json())
         .then(jsonResponse => {
-            console.log(jsonResponse);
-            writeImageReportToFile(jsonResponse);
+            reportOutputs.push(jsonResponse);
             //Java heap space exception (it should not occur)
             if(jsonResponse.status == 500) {
                 console.log(jsonResponse);
@@ -154,7 +151,8 @@ async function writeReportToFile(output) {
 async function getReportPeriodically() {
     while(true) {
         let output = await getReport();
-        writeReportToFile(output);
+        generateImagesReport();
+        //generatePerformanceReport();
         await sleep(5000);
     }
 }
@@ -177,6 +175,66 @@ async function stress() {
         await sleep(300);
     }
 }
+getImage("one");
+//getReportPeriodically();
+//stress();
 
-getReportPeriodically();
-stress();
+function generateImagesReport() {
+    // init document
+    let doc = new PDFDocument({ margin: 30, size: 'A4' });
+    // save document
+    doc.pipe(fs.createWriteStream("./report_imagens.pdf"));
+
+    ;(async function(){
+        // renderer function inside json file
+        const tableJson = { 
+        "headers": [
+            { "label":"Nome imagem", "property":"image", "width": 150 },
+            { "label":"Date", "property":"date", "width": 55 },
+            { "label":"Tempo inicio", "property":"startTime", "width": 55 },
+            { "label":"Tempo fim", "property":"endTime", "width": 55 },
+            { "label":"Algorithm", "property":"algorithm", "width": 55 },
+            { "label":"Iterations", "property":"totalIterations", "width": 55 },
+            { "label":"Time to complete", "property":"timeToComplete", "width": 55 }
+        ],
+        "datas": reportOutputs,
+        "options": {
+            "width": 300
+        }
+        };
+        // the magic
+        doc.table(tableJson);
+        // done!
+        doc.end();
+    })();
+}
+
+function generatePerformanceReport() {
+    // init document
+    let doc = new PDFDocument({ margin: 30, size: 'A4' });
+    // save document
+    doc.pipe(fs.createWriteStream("./report_performance.pdf"));
+
+    ;(async function(){
+        // renderer function inside json file
+        const tableJson = { 
+        "headers": [
+            { "label":"Nome imagem", "property":"image", "width": 150 },
+            { "label":"Date", "property":"date", "width": 55 },
+            { "label":"Tempo inicio", "property":"startTime", "width": 55 },
+            { "label":"Tempo fim", "property":"endTime", "width": 55 },
+            { "label":"Algorithm", "property":"algorithm", "width": 55 },
+            { "label":"Iterations", "property":"totalIterations", "width": 55 },
+            { "label":"Time to complete", "property":"timeToComplete", "width": 55 }
+        ],
+        "datas": reportOutputs,
+        "options": {
+            "width": 300
+        }
+        };
+        // the magic
+        doc.table(tableJson);
+        // done!
+        doc.end();
+    })();
+}

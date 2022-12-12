@@ -20,7 +20,7 @@ public interface Algorithm {
      */
     public enum Model {
         one,
-        two;
+        two
     }
 
     public enum AlgorithmType {

@@ -54,11 +54,9 @@ public class ApplicationController {
 
     @PostMapping("/process")
     public ResponseEntity<AlgorithmOutput> process(@RequestBody AlgorithmInputDTO algorithmInput) throws InterruptedException, IOException {
-
         if(!LoadMonitor.hasEnoughMemory(algorithmInput.getModel())) {
             waitForMemory(algorithmInput.getModel());
         }
-
         LoadMonitor.lowerMemoryAvailable(algorithmInput.getModel());
         System.out.println("Processing " + algorithmInput.getModel());
         AlgorithmOutput output = runAlgorithm(algorithmInput);
@@ -66,6 +64,7 @@ public class ApplicationController {
     }
     
     public static AlgorithmOutput runAlgorithm(AlgorithmInputDTO algorithmInput) {
+        System.out.println(algorithmInput.getType());
         Algorithm algorithm = getAlgorithmInstance(algorithmInput.getType());
         FloatMatrix arrayG = new FloatMatrix(algorithmInput.getArrayG());
         AlgorithmOutput output = null;
@@ -74,25 +73,12 @@ public class ApplicationController {
             output = algorithm.run(arrayG, algorithmInput);
         } catch(Exception e) {
             LoadMonitor.increaseMemoryAvailable(algorithmInput.getModel());
-            if(algorithmInput.getModel() == Model.one) 
-                LoadMonitor.isAboutToProcessModelOne.set(false);
-            else
-                LoadMonitor.isAboutToProcessModelTwo.set(false);
             System.gc();
             throw e;
         }
 
         return output;
     }
-
-    /*@ExceptionHandler(OutOfMemoryError.class)
-    public static ResponseEntity<String> handleOutOfMemory(OutOfMemoryError e) {
-            LoadMonitor.isAboutToProcessModelOne.set(false);
-            LoadMonitor.isAboutToProcessModelTwo.set(false);
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(e.getMessage());
-    }*/
 
     public static Algorithm getAlgorithmInstance(AlgorithmType type) {
         return type == AlgorithmType.CGNE ? new CGNE() : new CGNR();
