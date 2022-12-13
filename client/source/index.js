@@ -1,12 +1,13 @@
 import fetch from 'node-fetch';
 import * as fs from 'fs';
 import { parse } from 'csv-parse';
-import { exit, report } from 'process';
+import { exit } from 'process';
 import PDFDocument from 'pdfkit-table';
 
 var imageReportOutput = [];
 var processReportOutput = [];
-
+const memoryToProcessModelOne = 950;
+const memoryToProcessModelTwo = 200;
 const modelOneUsers = [
         {"user": "A", "type": "CGNR", "model":"one", "file": "../model1/G-1.csv", "N": 64, "S": 794, "gain": true},
         {"user": "B", "type": "CGNR", "model":"one", "file": "../model1/G-1.csv", "N": 64, "S": 794, "gain": false},
@@ -17,6 +18,7 @@ const modelOneUsers = [
         {"user": "K", "type": "CGNE", "model":"one", "file": "../model2/G-2.csv", "N": 64, "S": 794, "gain": true},
         {"user": "L", "type": "CGNE", "model":"one", "file": "../model2/G-2.csv", "N": 64, "S": 794, "gain": false}
 ];
+
 const modelTwoUsers = [
     {"user": "E", "type": "CGNR", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": true},
     {"user": "F", "type": "CGNR", "model":"two", "file": "../model2/g-30x30-1.csv", "N": 64, "S": 436, "gain": false},
@@ -28,22 +30,37 @@ const modelTwoUsers = [
     {"user": "P", "type": "CGNE", "model":"two", "file": "../model2/g-30x30-2.csv", "N": 64, "S": 436, "gain": false}
 ];
 
+const modelThreeUsers = [
+    {"user": "Q", "type": "CGNR", "model":"one", "file": "../model3/A-60x60-1.csv", "N": 64, "S": 436, "gain": true},
+    {"user": "R", "type": "CGNR", "model":"one", "file": "../model3/A-60x60-1.csv", "N": 64, "S": 436, "gain": false},
+    {"user": "S", "type": "CGNR", "model":"one", "file": "../model3/A-60x60-1.csv", "N": 64, "S": 436, "gain": true},
+    {"user": "T", "type": "CGNR", "model":"one", "file": "../model3/A-60x60-1.csv", "N": 64, "S": 436, "gain": false},
+    {"user": "W", "type": "CGNE", "model":"one", "file": "../model3/A-60x60-1.csv", "N": 64, "S": 436, "gain": true},
+    {"user": "U", "type": "CGNE", "model":"one", "file": "../model3/A-60x60-1.csv", "N": 64, "S": 436, "gain": false},
+    {"user": "X", "type": "CGNE", "model":"one", "file": "../model3/A-60x60-1.csv", "N": 64, "S": 436, "gain": true},
+    {"user": "Z", "type": "CGNE", "model":"one", "file": "../model3/A-60x60-1.csv", "N": 64, "S": 436, "gain": false}
+];
+
+
 function getRandomModelOneUser() {
     const randomIndex = Math.floor(Math.random() * modelOneUsers.length);
-    console.log(randomIndex);
     const user = modelOneUsers[randomIndex];
     return user;
 }
 
 function getRandomModelTwoUser() {
     const randomIndex = Math.floor(Math.random() * modelTwoUsers.length);
-    console.log(randomIndex);
     const user = modelTwoUsers[randomIndex];
     return user;
 }
 
+function getRandomModelThreeUser() {
+    const randomIndex = Math.floor(Math.random() * modelThreeUsers.length);
+    const user = modelThreeUsers[randomIndex];
+    return user;
+}
+
 function signalGain(arrayG, N, S) {
-    console.log("Gain!");
     for(let i = 0; i < N; i++) {
         for(let j = 0; j < S; j++) {
             let gain = 100 + (1/20) * j * Math.sqrt(j);
@@ -58,16 +75,17 @@ async function getImage(imageModel) {
     let user;
     if(imageModel == "one") {
         user = getRandomModelOneUser();
-    } else {
+    } else if (imageModel == "two") {
         user = getRandomModelTwoUser();
+    } else {
+        user = getRandomModelThreeUser();
     }
+
     const userName = user.user;
     const type = user.type;
     const model = user.model;
 
     let arrayG = []
-
-    console.log(type);
     let saveFile = true;
 
     fs.createReadStream(user.file)
@@ -121,55 +139,18 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function writeImageReportToFile(output) {
-    let line;
-
-    for (const key in output) {
-        line += `${key} : ${output[key]} \n`;
-    }
-    line += '\n';
-    console.log(line);
-
-    fs.appendFile("./relatorioImagens.txt", line, function(err) {
-        if(err) {
-            return console.log(err);
-        }
-    });
-}
-
-async function writeReportToFile(output) {
-    let line;
-
-    for (const key in output) {
-        line += `${key} : ${output[key]} \n`;
-    }
-    line += '\n';
-
-    fs.appendFile("./relatorio.txt", line, function(err) {
-        if(err) {
-            return console.log(err);
-        }
-    });
-}
-
 async function getReportPeriodically() {
     while(true) {
-        let output = await getReport();
         generateImagesReport();
         generatePerformanceReport();
         await sleep(5000);
     }
 }
 
-const memoryToProcessModelOne = 950;
-const memoryToProcessModelTwo = 200;
-
 async function stress() {
-    let i = 0;
     while(true) {
         let output = await getReport();
         let freeMemoryMb = output.freeMemoryMb;
-        console.log("Available memory:" + output.freeMemoryMb);
 
         if(freeMemoryMb > memoryToProcessModelOne) {
             getImage("one");
@@ -179,8 +160,6 @@ async function stress() {
         await sleep(300);
     }
 }
-
-stress();
 
 function generateImagesReport() {
     let doc = new PDFDocument({ margin: 30, size: 'A4' });
@@ -214,9 +193,8 @@ function generatePerformanceReport() {
     ;(async function(){
         const tableJson = { 
         "headers": [
-            { "label":"Memória livre", "property":"freeMemoryMb", "width": 55 },
-            { "label":"Memória usada", "property":"usedMemoryMb", "width": 55 },
-            { "label":"Uso de CPU", "property":"cpuUsage", "width": 55 },
+            { "label":"Memória usada", "property":"usedMemoryMb", "width": 80 },
+            { "label":"Uso de CPU", "property":"cpuUsage", "width": 100 },
         ],
         "datas": processReportOutput,
         "options": {
@@ -227,5 +205,6 @@ function generatePerformanceReport() {
         doc.end();
     })();
 }
-
+getImage('three');
 getReportPeriodically();
+
