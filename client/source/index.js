@@ -6,8 +6,10 @@ import PDFDocument from 'pdfkit-table';
 
 var imageReportOutput = [];
 var processReportOutput = [];
-const memoryToProcessModelOne = 950;
-const memoryToProcessModelTwo = 200;
+
+const memoryToProcessModelOne = 1000;
+const memoryToProcessModelTwo = 230;
+
 const modelOneUsers = [
         {"user": "A", "type": "CGNR", "model":"one", "file": "../model1/G-1.csv", "N": 64, "S": 794, "gain": true},
         {"user": "B", "type": "CGNR", "model":"one", "file": "../model1/G-1.csv", "N": 64, "S": 794, "gain": false},
@@ -87,6 +89,7 @@ async function getImage(imageModel) {
 
     let arrayG = []
     let saveFile = true;
+    console.log("Sending model " + imageModel);
 
     fs.createReadStream(user.file)
     .pipe(parse({ delimiter: "," }))
@@ -157,7 +160,7 @@ async function stress() {
         } else if(freeMemoryMb > memoryToProcessModelTwo) {
             getImage("two");
         }
-        await sleep(350);
+        await sleep(400);
     }
 }
 
@@ -205,5 +208,9 @@ function generatePerformanceReport() {
         doc.end();
     })();
 }
-getImage('three');
+/*getImage('one');
+getImage('one');
+getImage('one');
+getImage('three');*/
+stress();
 getReportPeriodically();

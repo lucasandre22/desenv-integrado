@@ -62,12 +62,12 @@ public class CGNE implements Algorithm {
             p = AlgorithmMatrixes.getMatrixH(model).transpose().mmul(r_next).add(p.mmul(beta));
             r = r_next;
         }
-        //LoadMonitor.increaseMemoryAvailable(algorithmInput.getModel());
 
         r_next = null;
         r = null;
         p = null;
         arrayG = null;
+
         //call garbage collector in order to free some memory
         System.gc();
 

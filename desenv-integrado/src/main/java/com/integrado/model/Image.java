@@ -39,6 +39,7 @@ public class Image {
             }
         }
 
+        System.out.println("Saving image");
         File file = new File("./" + filename);
         try {
             ImageIO.write(image, "bmp", file);

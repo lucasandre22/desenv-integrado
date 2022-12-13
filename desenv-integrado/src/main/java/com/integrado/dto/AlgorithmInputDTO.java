@@ -14,12 +14,4 @@ public class AlgorithmInputDTO {
     private AlgorithmType type;
     private Model model;
     private boolean saveFile = true;
-
-    /*public void setModel(Model model) {
-        if(model == Model.one)
-            LoadMonitor.isAboutToProcessModelOne.set(true);
-        else
-            LoadMonitor.isAboutToProcessModelTwo.set(false);
-        this.model = model;
-    }*/
 }

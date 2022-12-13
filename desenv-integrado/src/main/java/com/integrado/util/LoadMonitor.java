@@ -29,14 +29,14 @@ public class LoadMonitor {
     }
 
     public static synchronized void run() {
-            double cpuLoad = ManagementFactory.getPlatformMXBean(
-                    com.sun.management.OperatingSystemMXBean.class).getCpuLoad();
-            long freeMemory = Runtime.getRuntime().freeMemory();
-            LoadMonitor.cpuLoad = cpuLoad;
-            LoadMonitor.freeMemory.set((freeMemory/MB) - toLower);
-            LoadMonitor.usedMemory = (Runtime.getRuntime().totalMemory()-
-                    Runtime.getRuntime().freeMemory())/MB;
-            System.out.println(LoadMonitor.freeMemory);
+        double cpuLoad = ManagementFactory.getPlatformMXBean(
+                com.sun.management.OperatingSystemMXBean.class).getCpuLoad();
+        long freeMemory = Runtime.getRuntime().freeMemory();
+        LoadMonitor.cpuLoad = cpuLoad;
+        LoadMonitor.freeMemory.set((freeMemory/MB) - toLower);
+        LoadMonitor.usedMemory = (Runtime.getRuntime().totalMemory()-
+                Runtime.getRuntime().freeMemory())/MB;
+
     }
 
     public static double getLoadAverage() {
@@ -44,13 +44,11 @@ public class LoadMonitor {
     }
 
     public synchronized static void lowerMemoryAvailable(Model model) {
-        toLower += model == Model.one ? 950 : 230;
-        System.out.println("Lower to: " + toLower);
+        toLower += model == Model.one ? 1000 : 230;
     }
 
     public synchronized static void increaseMemoryAvailable(Model model) {
-        System.out.println("Increase to: " + toLower);
-        toLower -= model == Model.one ? 950 : 230;
+        toLower -= model == Model.one ? 1000 : 230;
     }
 
     public static boolean hasEnoughMemory(Model model) {

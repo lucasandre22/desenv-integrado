@@ -2,6 +2,7 @@ package com.integrado.controller;
 
 import java.io.IOException;
 import java.util.Queue;
+import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -51,7 +52,6 @@ public class ApplicationController {
     @GetMapping("/reports")
     public ResponseEntity<Report> getReport() {
         LoadMonitor.run();
-        System.out.println("Report:" + LoadMonitor.freeMemory.get());
         return new ResponseEntity<Report>(new Report(LoadMonitor.freeMemory.get(), LoadMonitor.usedMemory, LoadMonitor.getLoadAverage()), HttpStatus.OK);
     }
 
@@ -67,18 +67,10 @@ public class ApplicationController {
     }
     
     public static AlgorithmOutput runAlgorithm(AlgorithmInputDTO algorithmInput) {
-        System.out.println(algorithmInput.getType());
         Algorithm algorithm = getAlgorithmInstance(algorithmInput.getType());
         FloatMatrix arrayG = new FloatMatrix(algorithmInput.getArrayG());
         AlgorithmOutput output = null;
-        //if heap exception occurs inside the algorithm
-        try {
-            output = algorithm.run(arrayG, algorithmInput);
-        } catch(Exception e) {
-            LoadMonitor.increaseMemoryAvailable(algorithmInput.getModel());
-            System.gc();
-            throw e;
-        }
+        output = algorithm.run(arrayG, algorithmInput);
 
         return output;
     }
@@ -88,12 +80,13 @@ public class ApplicationController {
     }
 
     public static void waitForMemory(Model model) {
+        Random random = new Random();
         int i = 1;
         AtomicInteger privateNumber = new AtomicInteger(number.getAndAdd(1));
         queue.add(privateNumber);
-        while(!LoadMonitor.hasEnoughMemory(model) && queue.element() == privateNumber) {
+        while(!(LoadMonitor.hasEnoughMemory(model) && queue.element() == privateNumber)) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(random.nextInt(300) + 200);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -103,11 +96,9 @@ public class ApplicationController {
     }
 
     @ExceptionHandler(OutOfMemoryError.class)
-    public ResponseEntity<OutOfMemoryError> handleException(OutOfMemoryError e) {
-        System.out.println("Limpando pois deu excecao!");
+    public void handleException(OutOfMemoryError e) {
         System.gc();
         LoadMonitor.toLower = 0;
-        throw e;
-        //return new ResponseEntity<OutOfMemoryError>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+        //throw e;
     }
 }
