@@ -1,12 +1,13 @@
 package com.integrado.controller;
 
 import java.io.IOException;
-import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jblas.FloatMatrix;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.config.Task;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,7 +36,8 @@ public class ApplicationController {
 
     static FloatMatrix arrayGone = null;
     static FloatMatrix arrayGtwo = null;
-    //private PriorityQueue<Task> queue;
+    static Queue<AtomicInteger> queue = new ConcurrentLinkedQueue<AtomicInteger>();
+    static AtomicInteger number = new AtomicInteger(0);
     /**
      * Get status from server.
      * 
@@ -49,7 +51,8 @@ public class ApplicationController {
     @GetMapping("/reports")
     public ResponseEntity<Report> getReport() {
         LoadMonitor.run();
-        return new ResponseEntity<Report>(new Report(LoadMonitor.freeMemory, LoadMonitor.usedMemory, LoadMonitor.getLoadAverage()), HttpStatus.OK);
+        System.out.println("Report:" + LoadMonitor.freeMemory.get());
+        return new ResponseEntity<Report>(new Report(LoadMonitor.freeMemory.get(), LoadMonitor.usedMemory, LoadMonitor.getLoadAverage()), HttpStatus.OK);
     }
 
     @PostMapping("/process")
@@ -86,8 +89,9 @@ public class ApplicationController {
 
     public static void waitForMemory(Model model) {
         int i = 1;
-        //implement priority queue
-        while(!LoadMonitor.hasEnoughMemory(model)) {
+        AtomicInteger privateNumber = new AtomicInteger(number.getAndAdd(1));
+        queue.add(privateNumber);
+        while(!LoadMonitor.hasEnoughMemory(model) && queue.element() == privateNumber) {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
@@ -95,5 +99,15 @@ public class ApplicationController {
             }
             System.out.println("Waiting for memory... " + i++);
         }
+        queue.poll();
+    }
+
+    @ExceptionHandler(OutOfMemoryError.class)
+    public ResponseEntity<OutOfMemoryError> handleException(OutOfMemoryError e) {
+        System.out.println("Limpando pois deu excecao!");
+        System.gc();
+        LoadMonitor.toLower = 0;
+        throw e;
+        //return new ResponseEntity<OutOfMemoryError>(e, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

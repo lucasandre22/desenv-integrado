@@ -10,21 +10,11 @@ doc.pipe(fs.createWriteStream("./document.pdf"));
     // renderer function inside json file
     const tableJson = { 
       "headers": [
-        //{ "label":"Nome imagem", "property":"jsonProperty", "width":100 },
-        { "label":"Nome imagem", "property":"name", "width":100 },
-        { "label":"Tempo", "property":"age", "width":100 },
-        { "label":"Year", "property":"year", "width":100 }
+        { "label":"Nome imagem", "property":"image", "width": 250 },
+        { "label":"Tempo inicio", "property":"startTime", "width": 50 },
+        { "label":"Tempo fim", "property":"endTime", "width": 50 }
       ],
-      "datas": [
-        { "name":"bold:Name 1", "age":"Age 1", "year":"Year 1" },
-        { "name":"Name 2", "age":"Age 2", "year":"Year 2" },
-        { "name":"Name 3", "age":"Age 3", "year":"Year 3",
-          "renderer": "function(value, i, irow){ return value + `(${(1+irow)})`; }"
-        }
-      ],
-      "rows": [
-        [ "Name 4", "Age 4", "Year 4" ]
-      ],
+      "datas": reportOutputs,
       "options": {
         "width": 300
       }
@@ -33,4 +23,18 @@ doc.pipe(fs.createWriteStream("./document.pdf"));
     doc.table(tableJson);
     // done!
     doc.end();
-  })();
+})();
+
+/*"datas": [
+        {
+            "image": 'N_CGNR_11-12-2022_20:18:09_11-12-2022_20:18:09_900_2.bmp',
+            "algorithm": 'CGNR',
+            "imageLength": 30,
+            "pixelsLength": 900,
+            "date": '11-12-2022',
+            "startTime": '20:18:09',
+            "endTime": '20:18:09',
+            "totalIterations": 2,
+            "timeToComplete": 196
+        }
+      ],*/

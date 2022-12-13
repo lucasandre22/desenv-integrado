@@ -157,7 +157,7 @@ async function stress() {
         } else if(freeMemoryMb > memoryToProcessModelTwo) {
             getImage("two");
         }
-        await sleep(300);
+        await sleep(350);
     }
 }
 
@@ -207,4 +207,3 @@ function generatePerformanceReport() {
 }
 getImage('three');
 getReportPeriodically();
-

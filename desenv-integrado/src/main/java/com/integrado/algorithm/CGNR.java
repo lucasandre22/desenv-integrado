@@ -28,6 +28,9 @@ public class CGNR implements Algorithm {
      * @return AlgorithmOutput object.
      */
     public AlgorithmOutput run(FloatMatrix arrayG, AlgorithmInputDTO algorithmInput) throws OutOfMemoryError {
+        long freeMemory = Runtime.getRuntime().freeMemory();
+        System.out.println("Free memory before: " + freeMemory/(1000*1000));//model 1 nao aumenta
+        System.out.println("Load monitor memory: " + LoadMonitor.freeMemory);//model 1 nao aumenta
         LocalDateTime start = LocalDateTime.now();
         Model model = algorithmInput.getModel();
 
@@ -35,14 +38,16 @@ public class CGNR implements Algorithm {
         int outputImageLength = model == Model.one ? 60 : 30;
         FloatMatrix f = FloatMatrix.zeros(1, outputImageLength*outputImageLength);
         FloatMatrix r = arrayG;
+        freeMemory = Runtime.getRuntime().freeMemory();
+        System.out.println("Free memory before: " + freeMemory/(1000*1000));//model 1 nao aumenta
         FloatMatrix transpose = AlgorithmMatrixes.getMatrixH(model).transpose();
         FloatMatrix z = transpose.mmul(r);
         FloatMatrix p = z;
 
         FloatMatrix r_next;
         FloatMatrix z_anterior = z;
-        LoadMonitor.increaseMemoryAvailable(algorithmInput.getModel());
 
+        LoadMonitor.increaseMemoryAvailable(algorithmInput.getModel());
         long startTime = System.currentTimeMillis();
         int i = 1;
         for(i = 1; i < Constants.CONVERGENCE; i++) {
@@ -65,6 +70,7 @@ public class CGNR implements Algorithm {
 
             r = r_next;
             z_anterior = z;
+            
         }
         z = null;
         r_next = null;

@@ -34,7 +34,7 @@ public class CGNE implements Algorithm {
         FloatMatrix f = FloatMatrix.zeros(1, outputImageLength*outputImageLength);
         FloatMatrix r = arrayG;
         FloatMatrix p = AlgorithmMatrixes.getMatrixH(model).transpose().mmul(r);
-        LoadMonitor.increaseMemoryAvailable(algorithmInput.getModel());
+        
         FloatMatrix r_next;
 
         int i = 1;
@@ -44,6 +44,7 @@ public class CGNE implements Algorithm {
         float beta = 0;
 
         long startTime = System.currentTimeMillis();
+        LoadMonitor.increaseMemoryAvailable(algorithmInput.getModel());
         for(; i < Constants.CONVERGENCE; i++) {
             alpha = r_dot/p.dot(p);
             f = f.add(p.mmul(alpha));
@@ -57,9 +58,12 @@ public class CGNE implements Algorithm {
             new_r_dot = r_next.dot(r_next);
             beta = new_r_dot/r_dot;
             r_dot = new_r_dot;
+
             p = AlgorithmMatrixes.getMatrixH(model).transpose().mmul(r_next).add(p.mmul(beta));
             r = r_next;
         }
+        //LoadMonitor.increaseMemoryAvailable(algorithmInput.getModel());
+
         r_next = null;
         r = null;
         p = null;

@@ -13,6 +13,7 @@
   "dependencies": {
     "csv": "^6.2.5",
     "node-fetch": "^3.3.0",
+    "pdfkit-table": "^0.1.99",
     "request": "^2.88.2"
   }
 }
