@@ -1,10 +1,11 @@
 import fetch from 'node-fetch';
 import * as fs from 'fs';
 import { parse } from 'csv-parse';
-import { exit } from 'process';
+import { exit, report } from 'process';
 import PDFDocument from 'pdfkit-table';
 
-var reportOutputs = [];
+var imageReportOutput = [];
+var processReportOutput = [];
 
 const modelOneUsers = [
         {"user": "A", "type": "CGNR", "model":"one", "file": "../model1/G-1.csv", "N": 64, "S": 794, "gain": true},
@@ -86,7 +87,7 @@ async function getImage(imageModel) {
         })
         .then(response => response.json())
         .then(jsonResponse => {
-            reportOutputs.push(jsonResponse);
+            imageReportOutput.push(jsonResponse);
             //Java heap space exception (it should not occur)
             if(jsonResponse.status == 500) {
                 console.log(jsonResponse);
@@ -109,7 +110,10 @@ async function getReport() {
             'Accept': 'application/json',
         },
     }).then(response => response.json())
-    .then(jsonResponse => {output = jsonResponse});
+    .then(jsonResponse => {
+        output = jsonResponse;
+        processReportOutput.push(jsonResponse);
+    });
     return output;
 }
 
@@ -152,7 +156,7 @@ async function getReportPeriodically() {
     while(true) {
         let output = await getReport();
         generateImagesReport();
-        //generatePerformanceReport();
+        generatePerformanceReport();
         await sleep(5000);
     }
 }
@@ -175,18 +179,14 @@ async function stress() {
         await sleep(300);
     }
 }
-//getImage("one");
-//getReportPeriodically();
+
 stress();
 
 function generateImagesReport() {
-    // init document
     let doc = new PDFDocument({ margin: 30, size: 'A4' });
-    // save document
     doc.pipe(fs.createWriteStream("./report_imagens.pdf"));
 
     ;(async function(){
-        // renderer function inside json file
         const tableJson = { 
         "headers": [
             { "label":"Nome imagem", "property":"image", "width": 150 },
@@ -197,44 +197,35 @@ function generateImagesReport() {
             { "label":"Iterations", "property":"totalIterations", "width": 55 },
             { "label":"Time to complete", "property":"timeToComplete", "width": 55 }
         ],
-        "datas": reportOutputs,
+        "datas": imageReportOutput,
         "options": {
             "width": 300
         }
         };
-        // the magic
         doc.table(tableJson);
-        // done!
         doc.end();
     })();
 }
 
 function generatePerformanceReport() {
-    // init document
     let doc = new PDFDocument({ margin: 30, size: 'A4' });
-    // save document
     doc.pipe(fs.createWriteStream("./report_performance.pdf"));
 
     ;(async function(){
-        // renderer function inside json file
         const tableJson = { 
         "headers": [
-            { "label":"Nome imagem", "property":"image", "width": 150 },
-            { "label":"Date", "property":"date", "width": 55 },
-            { "label":"Tempo inicio", "property":"startTime", "width": 55 },
-            { "label":"Tempo fim", "property":"endTime", "width": 55 },
-            { "label":"Algorithm", "property":"algorithm", "width": 55 },
-            { "label":"Iterations", "property":"totalIterations", "width": 55 },
-            { "label":"Time to complete", "property":"timeToComplete", "width": 55 }
+            { "label":"Memória livre", "property":"freeMemoryMb", "width": 55 },
+            { "label":"Memória usada", "property":"usedMemoryMb", "width": 55 },
+            { "label":"Uso de CPU", "property":"cpuUsage", "width": 55 },
         ],
-        "datas": reportOutputs,
+        "datas": processReportOutput,
         "options": {
             "width": 300
         }
         };
-        // the magic
         doc.table(tableJson);
-        // done!
         doc.end();
     })();
 }
+
+getReportPeriodically();
